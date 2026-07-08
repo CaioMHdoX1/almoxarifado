@@ -1,0 +1,25 @@
+{
+	"name": "almoxarifado",
+	"version": "1.0.0",
+	"description": "",
+	"main": "index.js",
+	"scripts": {
+		"biome:check": "biome check .",
+		"biome:fix": "biome check --write ."
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/CaioMHdoX1/almoxarifado.git"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"type": "commonjs",
+	"bugs": {
+		"url": "https://github.com/CaioMHdoX1/almoxarifado/issues"
+	},
+	"homepage": "https://github.com/CaioMHdoX1/almoxarifado#readme",
+	"devDependencies": {
+		"@biomejs/biome": "^2.5.3"
+	}
+}
