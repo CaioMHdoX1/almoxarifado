@@ -1,0 +1,32 @@
+name: Validação de Código
+
+# Dispara o teste sempre que houver um push para qualquer branch
+on: [push]
+
+jobs:
+  testar-codigo:
+    # Aqui define que vai rodar em uma máquina virtual Linux (Ubuntu)
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Baixa o código do seu repositório na máquina Linux
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      # 2. Instala o Node.js na máquina
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20 # Ou a versão que você usa
+          cache: 'npm'
+
+      # 3. Instala as dependências do seu projeto
+      - name: Instalar dependências
+        run: npm ci
+
+      # 4. Roda as suas ferramentas de checagem
+      - name: Executar Biome Linter
+        run: npm run biome:fix
+
+      - name: Executar Type Check (TypeScript)
+        run: npm run type:check
