@@ -1,0 +1,44 @@
+services:
+  db:
+    image: postgres:15
+    container_name: almoxaf-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: almoxaf
+      POSTGRES_PASSWORD: almoxaf_dev_password
+      POSTGRES_DB: almoxaf
+    ports:
+      - "5432:5432"
+    volumes:
+      - almoxaf_db_data:/var/lib/postgresql/data
+      - ./db/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U almoxaf -d almoxaf"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+ 
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: almoxaf-pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@almoxaf.local
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+    ports:
+      - "5050:80"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - almoxaf_pgadmin_data:/var/lib/pgadmin
+ 
+  # ---------------------------------------------------------------------------
+  # Serviços "api" e "client" serão adicionados nas próximas etapas
+  # (Etapa 2 em diante: backend Java/Tomcat; Etapa 6 em diante: frontend Vite)
+  # ---------------------------------------------------------------------------
+ 
+volumes:
+  almoxaf_db_data:
+  almoxaf_pgadmin_data:
