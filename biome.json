@@ -9,10 +9,10 @@
     "ignoreUnknown": true,
     "includes": [
       "client/**",
-      "!client/node_modules/**",
-      "!client/dist/**",
+      "!client/node_modules",
+      "!client/dist",
       "!client/src/routeTree.gen.ts",
-      "!**/target/**",
+      "!**/target",
       "!**/*.gen.ts"
     ]
   },
