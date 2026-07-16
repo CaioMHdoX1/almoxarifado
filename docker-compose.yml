@@ -34,9 +34,25 @@ services:
     volumes:
       - almoxaf_pgadmin_data:/var/lib/pgadmin
  
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    container_name: almoxaf-api
+    restart: unless-stopped
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/almoxaf
+      DB_USER: almoxaf
+      DB_PASSWORD: almoxaf_dev_password
+      CLIENT_ORIGIN: http://localhost:5173
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+ 
   # ---------------------------------------------------------------------------
-  # Serviços "api" e "client" serão adicionados nas próximas etapas
-  # (Etapa 2 em diante: backend Java/Tomcat; Etapa 6 em diante: frontend Vite)
+  # Serviço "client" será adicionado na Etapa 6 (frontend Vite)
   # ---------------------------------------------------------------------------
  
 volumes:
