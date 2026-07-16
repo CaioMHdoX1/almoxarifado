@@ -1,51 +1,46 @@
 package com.almoxaf.api.config;
- 
+
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
- 
 import java.sql.Connection;
 import java.sql.SQLException;
- 
 
 public final class DataSourceProvider {
- 
-    private static volatile HikariDataSource dataSource;
- 
-    private DataSourceProvider() {
-    }
- 
+
+    private static volatile HikariDataSource ds;
+
+    private DataSourceProvider() {}
+
     public static synchronized void init() {
-        if (dataSource != null) {
+        if (ds != null) {
             return;
         }
- 
-        AppConfig config = AppConfig.getInstance();
- 
-        HikariConfig hikariConfig = new HikariConfig();
-        hikariConfig.setJdbcUrl(config.get("db.url"));
-        hikariConfig.setUsername(config.get("db.user"));
-        hikariConfig.setPassword(config.get("db.password"));
-        hikariConfig.setMaximumPoolSize(config.getInt("db.pool.maxSize"));
-        hikariConfig.setMinimumIdle(config.getInt("db.pool.minIdle"));
-        hikariConfig.setConnectionTimeout(config.getLong("db.pool.connectionTimeoutMs"));
-        hikariConfig.setPoolName("almoxaf-pool");
- 
-        dataSource = new HikariDataSource(hikariConfig);
+
+        AppConfig cfg = AppConfig.getInstance();
+        HikariConfig hCfg = new HikariConfig();
+
+        hCfg.setJdbcUrl(cfg.get("db.url"));
+        hCfg.setUsername(cfg.get("db.user"));
+        hCfg.setPassword(cfg.get("db.password"));
+        hCfg.setMaximumPoolSize(cfg.getInt("db.pool.maxSize"));
+        hCfg.setMinimumIdle(cfg.getInt("db.pool.minIdle"));
+        hCfg.setConnectionTimeout(cfg.getLong("db.pool.connectionTimeoutMs"));
+        hCfg.setPoolName("almoxaf-pool");
+
+        ds = new HikariDataSource(hCfg);
     }
- 
+
     public static Connection getConnection() throws SQLException {
-        if (dataSource == null) {
-            throw new IllegalStateException(
-                    "DataSourceProvider não foi inicializado. " +
-                    "Verifique se AppContextListener rodou no startup da aplicação.");
+        if (ds == null) {
+            throw new IllegalStateException("DataSourceProvider não inicializado.");
         }
-        return dataSource.getConnection();
+        return ds.getConnection();
     }
- 
+
     public static synchronized void close() {
-        if (dataSource != null) {
-            dataSource.close();
-            dataSource = null;
+        if (ds != null) {
+            ds.close();
+            ds = null;
         }
     }
 }
