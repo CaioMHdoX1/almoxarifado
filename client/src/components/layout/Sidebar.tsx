@@ -80,6 +80,7 @@ export function Sidebar({ paginaAtual, aoNavegar }: SidebarProps) {
                 return (
                   <li key={item.id}>
                     <button
+                      type="button"
                       onClick={() => aoNavegar(item.id)}
                       className={cn(
                         "flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-left text-sm transition-colors",

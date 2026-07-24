@@ -41,7 +41,12 @@ export function Inicio({ aoNavegar }: { aoNavegar: (pagina: PaginaId) => void })
         {ATALHOS.map((atalho) => {
           const Icone = atalho.icone;
           return (
-            <button key={atalho.id} onClick={() => aoNavegar(atalho.id)} className="text-left">
+            <button
+              key={atalho.id}
+              type="button"
+              onClick={() => aoNavegar(atalho.id)}
+              className="text-left"
+            >
               <Card className="h-full transition-shadow hover:shadow-md">
                 <div className="flex items-start gap-3">
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-secondary text-primary">

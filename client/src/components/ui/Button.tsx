@@ -19,12 +19,14 @@ const estilosPorVariante: Record<Variante, string> = {
 export function Button({
   variante = "primaria",
   icone,
+  type = "button",
   className,
   children,
   ...props
 }: BotaoProps) {
   return (
     <button
+      type={type}
       className={cn(
         "inline-flex items-center justify-center gap-2 rounded-md px-4 py-2.5 text-sm font-medium transition-colors",
         "disabled:cursor-not-allowed disabled:opacity-50",
