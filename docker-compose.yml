@@ -51,10 +51,7 @@ services:
       db:
         condition: service_healthy
  
-  # ---------------------------------------------------------------------------
-  # Serviço "client" será adicionado na Etapa 6 (frontend Vite)
-  # ---------------------------------------------------------------------------
- 
+
 volumes:
   almoxaf_db_data:
   almoxaf_pgadmin_data:
