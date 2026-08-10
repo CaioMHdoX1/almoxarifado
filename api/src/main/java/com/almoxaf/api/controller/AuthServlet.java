@@ -63,6 +63,7 @@ public class AuthServlet extends HttpServlet {
         LoginRequestDTO corpo = jsonMapper.readValue(req.getInputStream(), LoginRequestDTO.class);
 
         UsuarioResponseDTO usuario = authService.autenticar(corpo.getEmail(), corpo.getSenha());
+
         HttpSession sessao = req.getSession(true); 
         sessao.setAttribute(SessionKeys.USUARIO_ID, usuario.getId());
 
@@ -70,7 +71,7 @@ public class AuthServlet extends HttpServlet {
     }
 
     private void logout(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        HttpSession sessao = req.getSession(false);
+        HttpSession sessao = req.getSession(false); 
         if (sessao != null) {
             sessao.invalidate();
         }
