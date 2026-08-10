@@ -1,4 +1,4 @@
-import type { StatusEquipamento } from "@/lib/mock-data";
+import type { StatusEquipamento } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 export function StatusBadge({ status }: { status: StatusEquipamento }) {

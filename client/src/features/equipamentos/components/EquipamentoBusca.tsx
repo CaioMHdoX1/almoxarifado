@@ -40,7 +40,7 @@ export function EquipamentoBusca() {
           <Card key={grupo.nome}>
             <div className="flex flex-wrap items-center justify-between gap-3">
               <h3 className="font-serif text-lg text-foreground">{grupo.nome}</h3>
-              <div className="flex gap-2 text-sm">
+              <div className="flex flex-wrap gap-2 text-sm">
                 <span className="rounded-full bg-secondary px-3 py-1 font-medium text-secondary-foreground">
                   Total: {grupo.total}
                 </span>
@@ -53,28 +53,34 @@ export function EquipamentoBusca() {
               </div>
             </div>
 
-            <table className="mt-4 w-full border-t border-border pt-2 text-sm">
-              <thead>
-                <tr className="text-left text-xs uppercase tracking-wide text-muted-foreground">
-                  <th className="py-2 pr-4 font-medium">Código</th>
-                  <th className="py-2 pr-4 font-medium">Marca</th>
-                  <th className="py-2 pr-4 font-medium">Status</th>
-                  <th className="py-2 font-medium">Com quem está</th>
-                </tr>
-              </thead>
-              <tbody>
-                {grupo.itens.map((item) => (
-                  <tr key={item.id} className="border-t border-border/60">
-                    <td className="py-2 pr-4 font-mono text-xs text-foreground">{item.codigo}</td>
-                    <td className="py-2 pr-4 text-foreground">{item.marca}</td>
-                    <td className="py-2 pr-4">
-                      <StatusBadge status={item.status} />
-                    </td>
-                    <td className="py-2 text-foreground">{item.usuarioAtual?.nome ?? "—"}</td>
+            <div className="mt-4 overflow-x-auto border-t border-border pt-2">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="text-left text-xs uppercase tracking-wide text-muted-foreground">
+                    <th className="py-2 pr-4 font-medium">Código</th>
+                    <th className="py-2 pr-4 font-medium">Marca</th>
+                    <th className="py-2 pr-4 font-medium">Status</th>
+                    <th className="py-2 font-medium">Com quem está</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {grupo.itens.map((item) => (
+                    <tr key={item.id} className="border-t border-border/60">
+                      <td className="whitespace-nowrap py-2 pr-4 font-mono text-xs text-foreground">
+                        {item.codigo}
+                      </td>
+                      <td className="whitespace-nowrap py-2 pr-4 text-foreground">{item.marca}</td>
+                      <td className="whitespace-nowrap py-2 pr-4">
+                        <StatusBadge status={item.status} />
+                      </td>
+                      <td className="whitespace-nowrap py-2 text-foreground">
+                        {item.usuarioAtual?.nome ?? "—"}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </Card>
         ))}
       </div>

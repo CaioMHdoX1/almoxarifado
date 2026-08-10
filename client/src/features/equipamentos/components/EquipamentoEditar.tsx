@@ -7,7 +7,7 @@ import { useEditarEquipamento, useEquipamentos } from "@/features/equipamentos/a
 import { EquipamentoForm } from "@/features/equipamentos/components/EquipamentoForm";
 import { EquipamentoLista } from "@/features/equipamentos/components/EquipamentoLista";
 import type { EquipamentoFormValues } from "@/features/equipamentos/types";
-import type { Equipamento } from "@/lib/mock-data";
+import type { Equipamento } from "@/lib/types";
 
 export function EquipamentoEditar() {
   const { data: equipamentos, isLoading } = useEquipamentos();

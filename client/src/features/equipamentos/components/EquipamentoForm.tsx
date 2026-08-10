@@ -29,7 +29,7 @@ export function EquipamentoForm({
 
   async function onValid(dados: EquipamentoFormValues) {
     await aoSubmeter(dados);
-    if (!valoresIniciais) reset(); // só limpa no modo "adicionar"
+    if (!valoresIniciais) reset();
   }
 
   return (
