@@ -4,7 +4,7 @@
 	"description": "",
 	"main": "index.js",
 	"scripts": {
-		"type:check": "tsc -b",
+		"type:check": "tsc --noEmit -p client/tsconfig.json",
 		"type:fix": "tsc --noEmit --incremental false",
 		"biome:check": "biome check .",
 		"biome:fix": "biome check --write .",
