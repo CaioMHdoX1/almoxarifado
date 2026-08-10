@@ -4,6 +4,8 @@
 	"description": "",
 	"main": "index.js",
 	"scripts": {
+		"type:check": "tsc --noEmit",
+		"type:fix": "tsc --noEmit --incremental false",
 		"biome:check": "biome check .",
 		"biome:fix": "biome check --write .",
 		"pretest": "npm run biome:check",
@@ -24,7 +26,8 @@
 	"devDependencies": {
 		"@biomejs/biome": "^2.5.3",
 		"husky": "^9.1.7",
-		"lint-staged": "^15.2.10"
+		"lint-staged": "^15.2.10",
+		"typescript": "^7.0.2"
 	},
 	"lint-staged": {
 		"*.{js,jsx,ts,tsx,json,css}": [
