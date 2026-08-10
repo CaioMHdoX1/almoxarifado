@@ -80,7 +80,6 @@ public class EquipamentoService {
 
         List<EquipamentoStatus> linhas = equipamentoRepository.buscarStatusPorNomeContendo(termo.trim());
 
-        // LinkedHashMap preserva a ordem (a query já vem ordenada por nome)
         Map<String, List<EquipamentoStatus>> agrupadoPorNome = new LinkedHashMap<>();
         for (EquipamentoStatus linha : linhas) {
             agrupadoPorNome.computeIfAbsent(linha.getNome(), k -> new java.util.ArrayList<>()).add(linha);
