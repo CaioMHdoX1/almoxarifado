@@ -4,7 +4,7 @@
 	"description": "",
 	"main": "index.js",
 	"scripts": {
-		"type:check": "tsc --noEmit -p client/tsconfig.json",
+		"type:check": "cd client && npx tsc --noEmit",
 		"biome:check": "biome check .",
 		"biome:fix": "biome check --write .",
 		"pretest": "npm run biome:check",
