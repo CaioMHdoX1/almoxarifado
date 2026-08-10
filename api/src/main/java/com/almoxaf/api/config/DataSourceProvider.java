@@ -2,45 +2,49 @@ package com.almoxaf.api.config;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+
 import java.sql.Connection;
 import java.sql.SQLException;
 
 public final class DataSourceProvider {
 
-    private static volatile HikariDataSource ds;
+    private static volatile HikariDataSource dataSource;
 
-    private DataSourceProvider() {}
+    private DataSourceProvider() {
+    }
 
     public static synchronized void init() {
-        if (ds != null) {
-            return;
+        if (dataSource != null) {
+            return; 
         }
 
-        AppConfig cfg = AppConfig.getInstance();
-        HikariConfig hCfg = new HikariConfig();
+        AppConfig config = AppConfig.getInstance();
 
-        hCfg.setJdbcUrl(cfg.get("db.url"));
-        hCfg.setUsername(cfg.get("db.user"));
-        hCfg.setPassword(cfg.get("db.password"));
-        hCfg.setMaximumPoolSize(cfg.getInt("db.pool.maxSize"));
-        hCfg.setMinimumIdle(cfg.getInt("db.pool.minIdle"));
-        hCfg.setConnectionTimeout(cfg.getLong("db.pool.connectionTimeoutMs"));
-        hCfg.setPoolName("almoxaf-pool");
+        HikariConfig hikariConfig = new HikariConfig();
+        hikariConfig.setJdbcUrl(config.get("db.url"));
+        hikariConfig.setUsername(config.get("db.user"));
+        hikariConfig.setPassword(config.get("db.password"));
+        hikariConfig.setMaximumPoolSize(config.getInt("db.pool.maxSize"));
+        hikariConfig.setMinimumIdle(config.getInt("db.pool.minIdle"));
+        hikariConfig.setConnectionTimeout(config.getLong("db.pool.connectionTimeoutMs"));
+        hikariConfig.setPoolName("almoxaf-pool");
 
-        ds = new HikariDataSource(hCfg);
+        dataSource = new HikariDataSource(hikariConfig);
     }
 
     public static Connection getConnection() throws SQLException {
-        if (ds == null) {
-            throw new IllegalStateException("DataSourceProvider não inicializado.");
+        if (dataSource == null) {
+            throw new IllegalStateException(
+                    "DataSourceProvider não foi inicializado. " +
+                    "Verifique se AppContextListener rodou no startup da aplicação.");
         }
-        return ds.getConnection();
+        return dataSource.getConnection();
     }
 
     public static synchronized void close() {
-        if (ds != null) {
-            ds.close();
-            ds = null;
+        if (dataSource != null) {
+            dataSource.close();
+            dataSource = null;
         }
     }
 }

@@ -12,6 +12,8 @@
       "!client/node_modules",
       "!client/dist",
       "!client/src/routeTree.gen.ts",
+      "!client/public",
+      "!client/src/styles",
       "!**/target",
       "!**/*.gen.ts"
     ]
@@ -26,7 +28,12 @@
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": true
+      "preset": "recommended"
+    }
+  },
+  "css": {
+    "parser": {
+      "tailwindDirectives": true
     }
   },
   "javascript": {
