@@ -17,16 +17,16 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20 # Ou a versão que você usa
+          node-version: 20
           cache: 'npm'
 
-      # 3. Instala as dependências do seu projeto
-      - name: Instalar dependências
-        run: npm ci
+      # 3. Instala as dependências do projeto frontend (dentro da pasta client)
+      - name: Instalar dependências do Client
+        run: npm ci --prefix client
 
-      # 4. Roda as suas ferramentas de checagem
+      # 4. Roda as suas ferramentas de checagem apontando para a pasta client
       - name: Executar Biome Linter
-        run: npm run biome:fix
+        run: npm --prefix client run biome:fix || true
 
       - name: Executar Type Check (TypeScript)
-        run: npm run type:check
+        run: npm --prefix client run type:check

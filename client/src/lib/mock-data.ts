@@ -180,3 +180,4 @@ export async function removerEquipamento(id: number): Promise<void> {
   EQUIPAMENTOS.splice(index, 1);
   return delay(undefined);
 }
+erro;
