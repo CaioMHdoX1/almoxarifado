@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "type:check": "tsc --noEmit",
+    "type:fix": "tsc --noEmit --incremental false",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "test": "vitest run",

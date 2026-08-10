@@ -4,7 +4,8 @@
 	"description": "",
 	"main": "index.js",
 	"scripts": {
-		"type:check": "cd client && npx tsc --noEmit",
+		"type:check": "npm --prefix client run type:check",
+		"type:fix": "npm --prefix client run type:fix",
 		"biome:check": "biome check .",
 		"biome:fix": "biome check --write .",
 		"pretest": "npm run biome:check",
