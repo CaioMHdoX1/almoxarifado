@@ -5,9 +5,9 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { useCriarEquipamento } from "@/features/equipamentos/api";
 import { EquipamentoForm } from "@/features/equipamentos/components/EquipamentoForm";
-import { EquipamentoQrCode } from "@/features/equipamentos/components/EquipamentoQrCode";
 import type { EquipamentoFormValues } from "@/features/equipamentos/types";
 import type { Equipamento } from "@/lib/types";
+import { EquipamentoQrCode } from "./EquipamentoQrCode";
 
 export function EquipamentoAdicionar() {
   const criarEquipamento = useCriarEquipamento();
