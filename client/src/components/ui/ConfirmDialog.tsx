@@ -22,7 +22,7 @@ export function ConfirmDialog({
       <AlertDialog.Trigger render={(props) => <span {...props}>{trigger}</span>} />
       <AlertDialog.Portal>
         <AlertDialog.Backdrop className="fixed inset-0 bg-black/40 data-[state=open]:animate-in data-[state=open]:fade-in" />
-        <AlertDialog.Popup className="fixed left-1/2 top-1/2 w-full max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-lg bg-card p-6 shadow-xl">
+        <AlertDialog.Popup className="fixed left-1/2 top-1/2 w-[calc(100%-2rem)] max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-lg bg-card p-6 shadow-xl">
           <AlertDialog.Title className="text-base font-medium text-foreground">
             {titulo}
           </AlertDialog.Title>

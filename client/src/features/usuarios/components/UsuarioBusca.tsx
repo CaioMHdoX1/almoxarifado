@@ -36,14 +36,14 @@ export function UsuarioBusca() {
       <div className="flex flex-col gap-4">
         {resultados?.map(({ usuario, equipamentos }) => (
           <Card key={usuario.id}>
-            <div className="flex items-start justify-between">
+            <div className="flex flex-wrap items-start justify-between gap-2">
               <div>
                 <h3 className="font-serif text-lg text-foreground">{usuario.nome}</h3>
                 <p className="text-sm text-muted-foreground">
                   CPF {formatCpf(usuario.cpf)} · Projeto {usuario.projeto}
                 </p>
               </div>
-              <span className="rounded-full bg-secondary px-3 py-1 text-xs font-medium text-secondary-foreground">
+              <span className="shrink-0 rounded-full bg-secondary px-3 py-1 text-xs font-medium text-secondary-foreground">
                 {equipamentos.length} equipamento{equipamentos.length !== 1 && "s"}
               </span>
             </div>
@@ -51,7 +51,10 @@ export function UsuarioBusca() {
             {equipamentos.length > 0 ? (
               <ul className="mt-4 flex flex-col gap-2 border-t border-border pt-4">
                 {equipamentos.map((equipamento) => (
-                  <li key={equipamento.id} className="flex items-center gap-3 text-sm">
+                  <li
+                    key={equipamento.id}
+                    className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm"
+                  >
                     <Laptop className="h-4 w-4 shrink-0 text-muted-foreground" />
                     <span className="font-medium text-foreground">{equipamento.nome}</span>
                     <span className="text-muted-foreground">
