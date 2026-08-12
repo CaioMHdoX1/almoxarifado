@@ -7,10 +7,9 @@ import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Base64;
 
-
 public final class PasswordHasher {
 
-    private static final int ITERACOES = 210_000; // recomendação atual da OWASP para PBKDF2-SHA256
+    private static final int ITERACOES = 210_000;
     private static final int TAMANHO_SALT_BYTES = 16;
     private static final int TAMANHO_HASH_BITS = 256;
     private static final String ALGORITMO = "PBKDF2WithHmacSHA256";
