@@ -17,12 +17,10 @@ public class AuthService {
         this(new UsuarioRepository());
     }
 
-    /** Construtor usado pelos testes, para injetar um repository mockado. */
     public AuthService(UsuarioRepository usuarioRepository) {
         this.usuarioRepository = usuarioRepository;
     }
 
-   
     public UsuarioResponseDTO autenticar(String email, String senha) {
         if (email == null || email.isBlank() || senha == null || senha.isBlank()) {
             throw new CredenciaisInvalidasException("Informe email e senha.");

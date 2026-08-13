@@ -41,9 +41,9 @@ public class AuthFilter implements Filter {
         if (usuarioId == null) {
             JsonResponseWriter.writeError(resp, "Sessão inválida ou expirada. Faça login novamente.",
                     HttpServletResponse.SC_UNAUTHORIZED);
-            return; 
+            return;
         }
-
         chain.doFilter(request, response);
     }
 }
+

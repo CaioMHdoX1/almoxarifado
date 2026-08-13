@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-
 public class EquipamentoRepository {
 
     public Equipamento criar(String nome, String codigo, String marca) {
@@ -191,6 +190,27 @@ public class EquipamentoRepository {
         }
     }
 
+    public Optional<EquipamentoStatus> buscarStatusPorCodigo(String codigo) {
+        String sql = """
+                SELECT id, nome, codigo, marca, status, usuario_atual_id, usuario_atual_nome
+                FROM vw_equipamentos_status
+                WHERE codigo = ?
+                """;
+
+        try (Connection conexao = DataSourceProvider.getConnection();
+             PreparedStatement stmt = conexao.prepareStatement(sql)) {
+
+            stmt.setString(1, codigo);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (!rs.next()) return Optional.empty();
+                return Optional.of(mapearLinhaStatus(rs));
+            }
+        } catch (SQLException e) {
+            throw new IllegalStateException("Erro ao buscar equipamento por código.", e);
+        }
+    }
+
     public List<Equipamento> listarPorUsuarioId(long usuarioId) {
         String sql = """
                 SELECT id, nome, codigo, marca, categoria
@@ -222,7 +242,6 @@ public class EquipamentoRepository {
         equipamento.setNome(rs.getString("nome"));
         equipamento.setCodigo(rs.getString("codigo"));
         equipamento.setMarca(rs.getString("marca"));
-        
         return equipamento;
     }
 

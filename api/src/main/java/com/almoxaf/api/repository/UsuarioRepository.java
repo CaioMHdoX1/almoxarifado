@@ -38,7 +38,7 @@ public class UsuarioRepository {
                                 "Usuário recém-criado não encontrado (id=" + idGerado + ")."));
             }
         } catch (SQLException e) {
-
+           
             if ("23505".equals(e.getSQLState())) {
                 throw new RegistroDuplicadoException("Já existe um usuário cadastrado com esse CPF.");
             }
@@ -69,6 +69,7 @@ public class UsuarioRepository {
         }
     }
 
+    /** Busca por nome parcial, sem diferenciar maiúsculas/minúsculas. */
     public List<Usuario> buscarPorNomeContendo(String termo) {
         String sql = """
                 SELECT id, nome, cpf, projeto, email, senha_hash, criado_em

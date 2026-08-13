@@ -15,7 +15,7 @@ public final class DataSourceProvider {
 
     public static synchronized void init() {
         if (dataSource != null) {
-            return; 
+            return; // já inicializado — evita recriar o pool em redeploys acidentais
         }
 
         AppConfig config = AppConfig.getInstance();

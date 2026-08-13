@@ -9,7 +9,7 @@ import java.io.IOException;
 
 public class RequestSizeLimitFilter implements Filter {
 
-    private static final long LIMITE_BYTES = 1024L * 1024L; // 1 MB
+    private static final long LIMITE_BYTES = 1024L * 1024L; 
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)

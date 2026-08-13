@@ -32,6 +32,7 @@ public final class AppConfig {
         return INSTANCE;
     }
 
+    /** Retorna o valor já resolvido (variável de ambiente ou valor padrão do arquivo). */
     public String get(String key) {
         String raw = properties.getProperty(key);
         if (raw == null) {
@@ -51,6 +52,7 @@ public final class AppConfig {
     private String resolve(String rawValue) {
         Matcher matcher = PLACEHOLDER.matcher(rawValue);
         if (!matcher.matches()) {
+            // Valor literal, sem placeholder ${VAR:default}
             return rawValue;
         }
         String envVarName = matcher.group(1);

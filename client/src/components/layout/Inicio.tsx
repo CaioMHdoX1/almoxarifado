@@ -1,4 +1,4 @@
-import { PackagePlus, PackageSearch, UserPlus, UserSearch } from "lucide-react";
+import { PackagePlus, PackageSearch, QrCode, UserPlus, UserSearch } from "lucide-react";
 import type { PaginaId } from "@/components/layout/Sidebar";
 import { Card } from "@/components/ui/Card";
 
@@ -19,7 +19,7 @@ const ATALHOS: Array<{ id: PaginaId; label: string; icone: typeof UserPlus; desc
     id: "equipamentos-adicionar",
     label: "Adicionar equipamento",
     icone: PackagePlus,
-    descricao: "Cadastrar um novo item no almoxarifado",
+    descricao: "Cadastrar um novo item — gera o QR code na hora",
   },
   {
     id: "equipamentos-consultar",
@@ -27,14 +27,20 @@ const ATALHOS: Array<{ id: PaginaId; label: string; icone: typeof UserPlus; desc
     icone: PackageSearch,
     descricao: "Ver totais de disponíveis e alocados por nome",
   },
+  {
+    id: "equipamentos-ler-qr",
+    label: "Ler QR code",
+    icone: QrCode,
+    descricao: "Aponte a câmera e consulte o item na hora",
+  },
 ];
 
 export function Inicio({ aoNavegar }: { aoNavegar: (pagina: PaginaId) => void }) {
   return (
     <div className="flex flex-col gap-6">
       <p className="max-w-2xl text-sm text-muted-foreground">
-        Bem-vindo ao Almoxaf. Esta é uma versão inicial do frontend, com dados de exemplo — ainda
-        não conectada ao backend real.
+        Bem-vindo ao Almoxaf. Use os atalhos abaixo ou o menu lateral para gerenciar usuários e
+        equipamentos.
       </p>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">

@@ -44,7 +44,6 @@ public class EquipamentoService {
         Equipamento existente = equipamentoRepository.buscarPorId(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Equipamento não encontrado."));
 
-
         equipamentoRepository.buscarPorCodigo(validado.codigo())
                 .filter(outro -> !outro.getId().equals(existente.getId()))
                 .ifPresent(outro -> {
@@ -67,6 +66,17 @@ public class EquipamentoService {
         equipamentoRepository.remover(id);
     }
 
+    public EquipamentoResponseDTO buscarPorCodigo(String codigo) {
+        if (codigo == null || codigo.isBlank()) {
+            throw new RegraDeNegocioException("Informe o código do equipamento.");
+        }
+
+        return equipamentoRepository.buscarStatusPorCodigo(codigo.trim())
+                .map(EquipamentoMapper::paraResponseDTO)
+                .orElseThrow(() -> new RecursoNaoEncontradoException(
+                        "Nenhum equipamento encontrado com o código \"" + codigo.trim() + "\"."));
+    }
+
     public List<EquipamentoResponseDTO> listarTodos() {
         return equipamentoRepository.listarTodosComStatus().stream()
                 .map(EquipamentoMapper::paraResponseDTO)
@@ -76,6 +86,9 @@ public class EquipamentoService {
     public List<EquipamentoBuscaResultadoDTO> buscarPorNome(String termo) {
         if (termo == null || termo.isBlank()) {
             throw new RegraDeNegocioException("Informe um termo de busca.");
+        }
+        if (termo.length() > 150) {
+            throw new RegraDeNegocioException("Termo de busca muito longo.");
         }
 
         List<EquipamentoStatus> linhas = equipamentoRepository.buscarStatusPorNomeContendo(termo.trim());
@@ -112,11 +125,20 @@ public class EquipamentoService {
         if (nome.length() < 2) {
             throw new RegraDeNegocioException("Informe o nome do equipamento.");
         }
+        if (nome.length() > 150) {
+            throw new RegraDeNegocioException("Nome não pode ter mais de 150 caracteres.");
+        }
         if (codigo.isEmpty()) {
             throw new RegraDeNegocioException("Informe o código/patrimônio do equipamento.");
         }
+        if (codigo.length() > 50) {
+            throw new RegraDeNegocioException("Código não pode ter mais de 50 caracteres.");
+        }
         if (marca.isEmpty()) {
             throw new RegraDeNegocioException("Informe a marca do equipamento.");
+        }
+        if (marca.length() > 100) {
+            throw new RegraDeNegocioException("Marca não pode ter mais de 100 caracteres.");
         }
 
         return new DadosValidados(nome, codigo, marca);
