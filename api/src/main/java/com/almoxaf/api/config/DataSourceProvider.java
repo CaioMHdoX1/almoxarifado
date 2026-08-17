@@ -8,43 +8,44 @@ import java.sql.SQLException;
 
 public final class DataSourceProvider {
 
-    private static volatile HikariDataSource dataSource;
+    private static volatile HikariDataSource ds;
 
     private DataSourceProvider() {
     }
 
     public static synchronized void init() {
-        if (dataSource != null) {
-            return; // já inicializado — evita recriar o pool em redeploys acidentais
+        if (ds != null) {
+            return;
         }
 
-        AppConfig config = AppConfig.getInstance();
+        AppConfig cfg = AppConfig.getInstance();
 
-        HikariConfig hikariConfig = new HikariConfig();
-        hikariConfig.setJdbcUrl(config.get("db.url"));
-        hikariConfig.setUsername(config.get("db.user"));
-        hikariConfig.setPassword(config.get("db.password"));
-        hikariConfig.setMaximumPoolSize(config.getInt("db.pool.maxSize"));
-        hikariConfig.setMinimumIdle(config.getInt("db.pool.minIdle"));
-        hikariConfig.setConnectionTimeout(config.getLong("db.pool.connectionTimeoutMs"));
-        hikariConfig.setPoolName("almoxaf-pool");
+        HikariConfig hc = new HikariConfig();
+        hc.setJdbcUrl(cfg.get("db.url"));
+        hc.setUsername(cfg.get("db.user"));
+        hc.setPassword(cfg.get("db.password"));
+        hc.setDriverClassName("org.postgresql.Driver");
+        hc.setMaximumPoolSize(cfg.getInt("db.pool.maxSize"));
+        hc.setMinimumIdle(cfg.getInt("db.pool.minIdle"));
+        hc.setConnectionTimeout(cfg.getLong("db.pool.connectionTimeoutMs"));
+        hc.setPoolName("almoxaf-pool");
 
-        dataSource = new HikariDataSource(hikariConfig);
+        ds = new HikariDataSource(hc);
     }
 
     public static Connection getConnection() throws SQLException {
-        if (dataSource == null) {
+        if (ds == null) {
             throw new IllegalStateException(
                     "DataSourceProvider não foi inicializado. " +
                     "Verifique se AppContextListener rodou no startup da aplicação.");
         }
-        return dataSource.getConnection();
+        return ds.getConnection();
     }
 
     public static synchronized void close() {
-        if (dataSource != null) {
-            dataSource.close();
-            dataSource = null;
+        if (ds != null) {
+            ds.close();
+            ds = null;
         }
     }
 }

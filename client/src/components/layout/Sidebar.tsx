@@ -77,6 +77,7 @@ export function Sidebar({
 }: SidebarProps) {
   return (
     <>
+      {/* Overlay escuro atrás da gaveta — só existe no mobile, some a partir de md */}
       {aberta && (
         <button
           type="button"

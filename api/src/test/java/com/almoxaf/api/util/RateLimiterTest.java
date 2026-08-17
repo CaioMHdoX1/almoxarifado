@@ -1,35 +1,41 @@
 package com.almoxaf.api.util;
 
+import org.junit.jupiter.api.Test;
+
 import java.time.Duration;
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
-public class RateLimiter {
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-    private final int maxTentativas;
-    private final long janelaMs;
-    private final ConcurrentMap<String, Deque<Long>> tentativasPorChave = new ConcurrentHashMap<>();
+class RateLimiterTest {
 
-    public RateLimiter(int maxTentativas, Duration janela) {
-        this.maxTentativas = maxTentativas;
-        this.janelaMs = janela.toMillis();
+    @Test
+    void devePermitirAteOLimite() {
+        RateLimiter limiter = new RateLimiter(3, Duration.ofMinutes(1));
+
+        assertTrue(limiter.permitir("1.2.3.4"));
+        assertTrue(limiter.permitir("1.2.3.4"));
+        assertTrue(limiter.permitir("1.2.3.4"));
     }
 
-    public boolean permitir(String chave) {
-        long agora = System.currentTimeMillis();
-        Deque<Long> tentativas = tentativasPorChave.computeIfAbsent(chave, k -> new ArrayDeque<>());
+    @Test
+    void deveBloquearAposExcederOLimite() {
+        RateLimiter limiter = new RateLimiter(3, Duration.ofMinutes(1));
 
-        synchronized (tentativas) {
-            while (!tentativas.isEmpty() && agora - tentativas.peekFirst() > janelaMs) {
-                tentativas.pollFirst();
-            }
-            if (tentativas.size() >= maxTentativas) {
-                return false;
-            }
-            tentativas.addLast(agora);
-            return true;
-        }
+        limiter.permitir("1.2.3.4");
+        limiter.permitir("1.2.3.4");
+        limiter.permitir("1.2.3.4");
+
+        assertFalse(limiter.permitir("1.2.3.4"));
+    }
+
+    @Test
+    void chavesDiferentesTemContadoresIndependentes() {
+        RateLimiter limiter = new RateLimiter(1, Duration.ofMinutes(1));
+
+        assertTrue(limiter.permitir("1.2.3.4"));
+        assertFalse(limiter.permitir("1.2.3.4"));
+
+        assertTrue(limiter.permitir("5.6.7.8"));
     }
 }

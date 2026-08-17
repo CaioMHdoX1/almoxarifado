@@ -242,6 +242,7 @@ public class EquipamentoRepository {
         equipamento.setNome(rs.getString("nome"));
         equipamento.setCodigo(rs.getString("codigo"));
         equipamento.setMarca(rs.getString("marca"));
+    
         return equipamento;
     }
 

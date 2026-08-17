@@ -27,6 +27,15 @@ public class EquipamentoServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         try {
+            String pathInfo = req.getPathInfo(); // null, ou "/codigo/PAT-00812"
+
+            if (pathInfo != null && pathInfo.startsWith("/codigo/")) {
+                String codigo = pathInfo.substring("/codigo/".length());
+                EquipamentoResponseDTO resultado = equipamentoService.buscarPorCodigo(codigo);
+                JsonResponseWriter.writeData(resp, resultado);
+                return;
+            }
+
             String nome = req.getParameter("nome");
 
             if (nome != null && !nome.isBlank()) {
@@ -78,11 +87,11 @@ public class EquipamentoServlet extends HttpServlet {
     }
 
     private long extrairId(HttpServletRequest req) {
-        String pathInfo = req.getPathInfo(); 
+        String pathInfo = req.getPathInfo(); // ex.: "/42"
         if (pathInfo == null || pathInfo.equals("/")) {
             throw new RegraDeNegocioException("Informe o id do equipamento na URL (ex.: /api/equipamentos/42).");
         }
-        String idBruto = pathInfo.substring(1);
+        String idBruto = pathInfo.substring(1); // remove a barra inicial
         try {
             return Long.parseLong(idBruto);
         } catch (NumberFormatException e) {
