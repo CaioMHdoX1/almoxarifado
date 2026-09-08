@@ -6,46 +6,52 @@ import com.zaxxer.hikari.HikariDataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+/**
+ * Ponto único de acesso ao pool de conexões com o Postgres.
+ *
+ * <p>Inicializado uma vez pelo {@link AppContextListener} quando a aplicação
+ * sobe, e usado por todos os {@code repository} para pegar uma
+ * {@link Connection} emprestada do pool.</p>
+ */
 public final class DataSourceProvider {
 
-    private static volatile HikariDataSource ds;
+    private static volatile HikariDataSource dataSource;
 
     private DataSourceProvider() {
     }
 
     public static synchronized void init() {
-        if (ds != null) {
-            return;
+        if (dataSource != null) {
+            return; // já inicializado — evita recriar o pool em redeploys acidentais
         }
 
-        AppConfig cfg = AppConfig.getInstance();
+        AppConfig config = AppConfig.getInstance();
 
-        HikariConfig hc = new HikariConfig();
-        hc.setJdbcUrl(cfg.get("db.url"));
-        hc.setUsername(cfg.get("db.user"));
-        hc.setPassword(cfg.get("db.password"));
-        hc.setDriverClassName("org.postgresql.Driver");
-        hc.setMaximumPoolSize(cfg.getInt("db.pool.maxSize"));
-        hc.setMinimumIdle(cfg.getInt("db.pool.minIdle"));
-        hc.setConnectionTimeout(cfg.getLong("db.pool.connectionTimeoutMs"));
-        hc.setPoolName("almoxaf-pool");
+        HikariConfig hikariConfig = new HikariConfig();
+        hikariConfig.setJdbcUrl(config.get("db.url"));
+        hikariConfig.setUsername(config.get("db.user"));
+        hikariConfig.setPassword(config.get("db.password"));
+        hikariConfig.setMaximumPoolSize(config.getInt("db.pool.maxSize"));
+        hikariConfig.setMinimumIdle(config.getInt("db.pool.minIdle"));
+        hikariConfig.setConnectionTimeout(config.getLong("db.pool.connectionTimeoutMs"));
+        hikariConfig.setPoolName("almoxaf-pool");
 
-        ds = new HikariDataSource(hc);
+        dataSource = new HikariDataSource(hikariConfig);
     }
 
     public static Connection getConnection() throws SQLException {
-        if (ds == null) {
+        if (dataSource == null) {
             throw new IllegalStateException(
                     "DataSourceProvider não foi inicializado. " +
                     "Verifique se AppContextListener rodou no startup da aplicação.");
         }
-        return ds.getConnection();
+        return dataSource.getConnection();
     }
 
     public static synchronized void close() {
-        if (ds != null) {
-            ds.close();
-            ds = null;
+        if (dataSource != null) {
+            dataSource.close();
+            dataSource = null;
         }
     }
 }

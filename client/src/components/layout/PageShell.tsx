@@ -1,14 +1,14 @@
 import { type ReactNode, useState } from "react";
 import { Header } from "@/components/layout/Header";
 import { type PaginaId, Sidebar } from "@/components/layout/Sidebar";
-import type { Usuario } from "@/lib/types";
+import type { Administrador } from "@/lib/types";
 
 type PageShellProps = {
   paginaAtual: PaginaId;
   aoNavegar: (pagina: PaginaId) => void;
   titulo: string;
   descricao?: string;
-  usuario: Usuario;
+  usuario: Administrador;
   aoSair: () => void;
   children: ReactNode;
 };
@@ -24,6 +24,8 @@ export function PageShell({
 }: PageShellProps) {
   const [menuAberto, setMenuAberto] = useState(false);
 
+  // No mobile, navegar já fecha o menu sozinho — evita o usuário ter que
+  // tocar duas vezes (escolher a página, depois fechar a gaveta).
   function navegarEFechar(pagina: PaginaId) {
     aoNavegar(pagina);
     setMenuAberto(false);

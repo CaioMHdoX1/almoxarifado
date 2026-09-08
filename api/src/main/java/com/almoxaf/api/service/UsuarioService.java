@@ -26,6 +26,7 @@ public class UsuarioService {
         this(new UsuarioRepository(), new EquipamentoRepository());
     }
 
+    /** Construtor usado pelos testes, para injetar repositories mockados. */
     public UsuarioService(UsuarioRepository usuarioRepository, EquipamentoRepository equipamentoRepository) {
         this.usuarioRepository = usuarioRepository;
         this.equipamentoRepository = equipamentoRepository;
@@ -52,6 +53,9 @@ public class UsuarioService {
             throw new RegraDeNegocioException("Nome do projeto não pode ter mais de 150 caracteres.");
         }
 
+        // Checagem "otimista" — dá uma mensagem melhor na maioria dos casos.
+        // A proteção definitiva contra corrida entre requisições simultâneas
+        // é a constraint UNIQUE do banco, reforçada no UsuarioRepository.criar.
         if (usuarioRepository.buscarPorCpf(cpf).isPresent()) {
             throw new RegistroDuplicadoException("Já existe um usuário cadastrado com esse CPF.");
         }
@@ -60,6 +64,11 @@ public class UsuarioService {
         return UsuarioMapper.paraResponseDTO(usuarioCriado);
     }
 
+    /**
+     * Busca usuários por nome (parcial, sem diferenciar maiúsculas) e já
+     * traz, para cada um, os equipamentos atualmente alocados a ele — é
+     * exatamente o comportamento pedido na especificação do projeto.
+     */
     public List<UsuarioComEquipamentosDTO> buscarPorNome(String termo) {
         if (termo == null || termo.isBlank()) {
             throw new RegraDeNegocioException("Informe um termo de busca.");

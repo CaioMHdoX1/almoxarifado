@@ -51,9 +51,11 @@ api/
     │   │   ├── mapper/        Conversão Model <-> DTO (ex: UsuarioMapper,
     │   │   │                  EquipamentoMapper). Mantém o Service limpo.
     │   │   │
-    │   │   ├── filter/        Jakarta Filters: AuthFilter (bloqueia rotas sem
-    │   │   │                  sessão válida), CorsFilter (libera o client em
-    │   │   │                  dev), talvez LoggingFilter.
+    │   │   ├── filter/        Jakarta Filters, nesta ordem: RequestSizeLimitFilter
+    │   │   │                  (rejeita corpo gigante) → SecurityHeadersFilter
+    │   │   │                  (headers de segurança) → CorsFilter (libera o
+    │   │   │                  client) → CsrfOriginCheckFilter (valida Origin/
+    │   │   │                  Referer) → AuthFilter (exige sessão válida).
     │   │   │
     │   │   ├── exception/     Exceções customizadas (ex:
     │   │   │                  RecursoNaoEncontradoException,

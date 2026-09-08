@@ -1,5 +1,6 @@
 package com.almoxaf.api.dto;
 
+/** Versão resumida de equipamento, embutida na resposta de busca de usuário. */
 public class EquipamentoResumoDTO {
 
     private Long id;

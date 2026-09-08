@@ -28,16 +28,25 @@ public final class EquipamentoMapper {
                 status.getNome(),
                 status.getCodigo(),
                 status.getMarca(),
+                status.getDescricao(),
+                status.getTipo(),
+                status.getQuantidade(),
                 status.getStatus(),
                 usuarioAtual);
     }
 
+    /** Usado logo após criar/editar um equipamento — nunca tem alocação nesse momento. */
     public static EquipamentoResponseDTO paraResponseDTORecemCriado(Equipamento equipamento) {
+        // Itens "almoxarifado" nunca são alocados a alguém (controle é por
+        // quantidade), então o status deles é sempre "disponivel".
         return new EquipamentoResponseDTO(
                 equipamento.getId(),
                 equipamento.getNome(),
                 equipamento.getCodigo(),
                 equipamento.getMarca(),
+                equipamento.getDescricao(),
+                equipamento.getTipo(),
+                equipamento.getQuantidade(),
                 "disponivel",
                 null);
     }

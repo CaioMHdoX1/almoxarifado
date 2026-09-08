@@ -6,6 +6,15 @@ import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Carrega o {@code application.properties} do classpath e resolve valores no
+ * formato {@code ${VAR_DE_AMBIENTE:valor_padrao}}.
+ *
+ * <p>Isso permite que o mesmo arquivo funcione tanto localmente (usando o
+ * valor padrão) quanto dentro do Docker Compose, onde as variáveis de
+ * ambiente definidas no {@code docker-compose.yml}/{@code .env} sobrescrevem
+ * o padrão.</p>
+ */
 public final class AppConfig {
 
     private static final Pattern PLACEHOLDER =

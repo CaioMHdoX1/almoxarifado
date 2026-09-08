@@ -4,6 +4,12 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * Lê e interpreta a variável de ambiente {@code CLIENT_ORIGIN} (lista de
+ * origens separadas por vírgula). Usado tanto pelo {@code CorsFilter}
+ * quanto pelo {@code CsrfOriginCheckFilter} — os dois precisam da mesma
+ * lista, então ela é lida uma única vez aqui.
+ */
 public final class AllowedOrigins {
 
     private static final String PADRAO = "http://localhost:5173,http://localhost:3000";

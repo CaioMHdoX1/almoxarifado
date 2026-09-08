@@ -1,0 +1,96 @@
+# ============================================================================
+# Docker Compose de PRODUÇÃO.
+#
+# Diferenças importantes em relação ao docker-compose.yml (desenvolvimento):
+#   - Nenhum serviço interno (db, api, client) publica porta pro host — só
+#     o Caddy (80/443) fica acessível pela internet. Tudo o mais só
+#     conversa pela rede interna do Docker, pelo nome do serviço.
+#   - Tudo fica atrás de UM domínio só (HTTPS automático via Caddy),
+#     eliminando CORS entre frontend e API.
+#   - api é buildada com SECURE_COOKIES=true (cookie de sessão só trafega
+#     em HTTPS — só é seguro fazer isso porque agora TEM HTTPS de verdade).
+#   - client é buildado com VITE_API_URL vazio (chamadas relativas, tipo
+#     /api/..., já que front e back estão no mesmo domínio agora).
+#
+# USO:
+#   cp .env.production.example .env.production
+#   # edite .env.production com valores reais (domínio, senhas fortes)
+#   docker compose --env-file .env.production -f docker-compose.prod.yml up -d --build
+# ============================================================================
+
+services:
+  db:
+    image: postgres:15
+    container_name: almoxaf-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - almoxaf_db_data:/var/lib/postgresql/data
+      - ./db/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    # SEM "ports:" de propósito — só acessível de dentro da rede do Docker.
+    # Se precisar acessar o banco de fora (ex.: pra debugar), use um túnel
+    # SSH em vez de publicar a porta 5432 pra internet:
+    #   ssh -L 5432:localhost:5432 usuario@seu-servidor
+
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+      args:
+        SECURE_COOKIES: "true"
+    container_name: almoxaf-api
+    restart: unless-stopped
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/${POSTGRES_DB}
+      DB_USER: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      CLIENT_ORIGIN: https://${DOMINIO}
+    depends_on:
+      db:
+        condition: service_healthy
+    # SEM "ports:" — só o Caddy fala com a api, pelo nome do serviço.
+
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        # Vazio de propósito: front e back estão no mesmo domínio (o Caddy
+        # cuida do roteamento /api/* -> api, resto -> client), então as
+        # chamadas do frontend usam caminho relativo, tipo /api/usuarios.
+        VITE_API_URL: ""
+    container_name: almoxaf-client
+    restart: unless-stopped
+    depends_on:
+      - api
+    # SEM "ports:" — só o Caddy fala com o client.
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: almoxaf-caddy
+    restart: unless-stopped
+    environment:
+      DOMINIO: ${DOMINIO}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - api
+      - client
+
+volumes:
+  almoxaf_db_data:
+  caddy_data:
+  caddy_config:

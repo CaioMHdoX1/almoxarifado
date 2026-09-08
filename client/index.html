@@ -5,6 +5,17 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Almoxaf — Controle de Equipamentos</title>
+    <script>
+      // Roda antes de qualquer coisa renderizar — evita o "flash" de tema
+      // claro por uma fração de segundo quando o usuário prefere o escuro.
+      // Duplicado de lib/theme.ts de propósito: esse script não pode
+      // esperar o bundle de módulos carregar.
+      (() => {
+        var salvo = localStorage.getItem("almoxaf-theme");
+        var escuro = salvo ? salvo === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
+        if (escuro) document.documentElement.classList.add("dark");
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

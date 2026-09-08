@@ -25,6 +25,9 @@ export function EquipamentoAdicionar() {
     }
   }
 
+  // Depois de cadastrar, mostra o QR code em vez do formulário — o
+  // próximo passo natural é imprimir/colar essa etiqueta no equipamento
+  // físico, não ficar olhando pro form vazio de novo.
   if (equipamentoCriado) {
     return (
       <div className="flex max-w-lg flex-col gap-4">

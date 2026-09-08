@@ -1,22 +1,21 @@
 package com.almoxaf.api.dto;
 
+/** Formato de usuário (pessoa) que a API expõe publicamente. */
 public class UsuarioResponseDTO {
 
     private Long id;
     private String nome;
     private String cpf;
     private String projeto;
-    private String email;
 
     public UsuarioResponseDTO() {
     }
 
-    public UsuarioResponseDTO(Long id, String nome, String cpf, String projeto, String email) {
+    public UsuarioResponseDTO(Long id, String nome, String cpf, String projeto) {
         this.id = id;
         this.nome = nome;
         this.cpf = cpf;
         this.projeto = projeto;
-        this.email = email;
     }
 
     public Long getId() {
@@ -49,13 +48,5 @@ public class UsuarioResponseDTO {
 
     public void setProjeto(String projeto) {
         this.projeto = projeto;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
     }
 }

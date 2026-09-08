@@ -23,6 +23,7 @@ export function useBuscaEquipamentoPorNome(termo: string) {
   });
 }
 
+/** Busca exata por código — usada pela leitura do QR code. */
 export function useEquipamentoPorCodigo(codigo: string) {
   return useQuery({
     queryKey: [...CHAVE_BASE, "codigo", codigo],

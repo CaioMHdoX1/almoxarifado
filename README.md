@@ -15,6 +15,41 @@ almoxaf-project/
 └── docker-compose.yml
 ```
 
+## ⚠️ Mudanças importantes nesta leva (leia antes de rodar)
+
+- **O banco mudou de estrutura** (administrador separado dos usuários, novos
+  campos em equipamentos, tabela de relatórios). Se você já tinha rodado o
+  projeto antes, **precisa resetar o volume do Postgres**:
+  ```bash
+  docker compose down -v
+  docker compose up -d --build
+  ```
+- **Login agora é só com o administrador único**: `admin@almoxaf.local` /
+  `123456`. Os emails antigos (`ana.costa@empresa.com` etc.) não fazem mais
+  login — essas pessoas continuam existindo como "usuários" (quem recebe
+  equipamento), só não têm mais conta.
+- **Frontend de Relatórios** — pronto: menu lateral → Relatórios quinzenais.
+  Lista os relatórios gerados, com um botão "Gerar agora", e ao clicar em
+  um deles mostra entregas, devoluções e quem estava com o quê naquele
+  período.
+- Adicionado: mostrar/ocultar senha no login, modo noturno (botão no rodapé
+  do menu lateral), campo "Descrição" no equipamento, e o campo "Tipo"
+  (Equipamento / Almoxarifado) — item de almoxarifado pede quantidade em
+  vez de ser alocado a alguém.
+
+## Como testar os relatórios (backend, sem tela ainda)
+
+```bash
+# gerar um relatório agora mesmo (por padrão, últimos 15 dias)
+curl -i -b cookies.txt -X POST http://localhost:8080/api/relatorios/gerar
+
+# listar relatórios já gerados
+curl -b cookies.txt http://localhost:8080/api/relatorios
+
+# ver o detalhe de um relatório específico (troque {id})
+curl -b cookies.txt http://localhost:8080/api/relatorios/{id}
+```
+
 ## Status atual do projeto (progresso por etapas)
 
 - [x] **Etapa 0** — Esqueleto do monorepo
@@ -85,14 +120,18 @@ Camadas de defesa implementadas no backend:
 | Senha fraca (quando existir cadastro de senha pelo usuário) | `PasswordPolicy` já pronta, ver comentário na classe |
 | Vazamento de stacktrace/erro interno | `ApiExceptionHandler` nunca expõe exceção crua ao cliente, só loga no servidor |
 
-### Antes de ir pra produção de verdade, ainda falta (checklist)
+### Checklist de produção
 
-- [ ] Ativar `<secure>true</secure>` no `cookie-config` do `web.xml` (exige HTTPS na frente)
-- [ ] Colocar a API atrás de HTTPS (reverse proxy — Nginx/Caddy/Traefik — ou load balancer com TLS)
-- [ ] Trocar a senha do Postgres/pgAdmin do `.env` (as do repositório são só para dev local)
+- [x] HTTPS de verdade (Caddy + Let's Encrypt automático) — ver `DEPLOY.md`
+- [x] Cookie de sessão com `Secure` ativado em produção (`SECURE_COOKIES=true` no build da API — automático via `docker-compose.prod.yml`)
+- [x] Senha do administrador trocada antes de ir ao ar (`scripts/gerar-hash-senha.js`) — ver `DEPLOY.md`
+- [x] Banco/API/frontend sem porta exposta à internet (só o Caddy é público) — ver `docker-compose.prod.yml`
 - [ ] Criar um usuário de banco com permissões mínimas pra API (hoje ela usa o mesmo usuário `almoxaf` que tem acesso total ao schema — em produção, restrinja a `SELECT/INSERT/UPDATE/DELETE` nas tabelas específicas, sem `DROP`/`ALTER`)
 - [ ] Se o `RateLimiter` precisar funcionar com múltiplas instâncias da API atrás de um load balancer, trocar a implementação em memória por uma compartilhada (Redis, por exemplo)
 - [ ] Rodar `mvn dependency-check` ou similar periodicamente para checar CVEs nas dependências (Postgres driver, Jackson, HikariCP)
+- [ ] Configurar backup automático do banco (ver passo 9 do `DEPLOY.md`)
+
+**Guia completo passo a passo (servidor do zero até no ar): ver [`DEPLOY.md`](./DEPLOY.md).**
 
 ## Como testar o login agora (Etapa 3)
 
@@ -104,7 +143,7 @@ docker compose up -d --build db api
 # login — deve retornar { "data": { "usuario": {...} } } e um cookie de sessão
 curl -i -c cookies.txt -X POST http://localhost:8080/api/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"email":"ana.costa@empresa.com","senha":"123456"}'
+  -d '{"email":"admin@almoxaf.local","senha":"123456"}'
 
 # usando o cookie salvo, confirma quem está logado
 curl -b cookies.txt http://localhost:8080/api/auth/me
@@ -196,13 +235,16 @@ bloquear a câmera mesmo com a permissão concedida.
 O que funciona hoje sem configuração extra:
 - **No navegador do computador**, acessando por `http://localhost:5173` — a
   câmera do notebook funciona normalmente (localhost é uma exceção da regra).
-- **Em produção de verdade**, atrás de HTTPS (ver checklist na seção
-  "Segurança" acima) — funciona no celular sem nenhum ajuste.
+- **Em produção de verdade** (ver `DEPLOY.md`) — o Caddy já cuida do HTTPS
+  automaticamente, então a câmera funciona no celular sem nenhum ajuste
+  extra, inclusive fora da rede local.
 
 O que **não** funciona sem configuração extra:
 - Testar no celular acessando pelo IP da rede local em HTTP puro (o cenário
-  descrito na seção "Usando pelo celular"). Pra validar a câmera nesse
-  cenário antes de ter HTTPS de produção, duas opções:
+  descrito na seção "Usando pelo celular"). Isso é só uma limitação do
+  ambiente de desenvolvimento local — não existe em produção. Se precisar
+  mesmo assim testar a câmera nesse cenário específico antes de fazer o
+  deploy, duas opções:
   1. Gerar um certificado local (ex.: [mkcert](https://github.com/FiloSottile/mkcert))
      e configurar o Vite pra servir com HTTPS — mais trabalho, mas fica
      igual à produção.
@@ -232,7 +274,7 @@ docker compose up -d --build
 - **Postgres**: localhost:5432
 - **pgAdmin**: http://localhost:5050
 
-Login com qualquer usuário do seed — ex. `ana.costa@empresa.com` / `123456`.
+Login: `admin@almoxaf.local` / `123456` (administrador único do sistema — os "usuários" cadastrados no app são pessoas que recebem equipamento, não fazem login).
 
 Pra derrubar tudo e resetar o banco do zero:
 ```bash
@@ -313,7 +355,7 @@ npm run dev
 ```
 
 Acesse `http://localhost:5173` e entre com qualquer usuário do seed —
-por exemplo `ana.costa@empresa.com` / senha `123456`.
+o administrador único do seed: `admin@almoxaf.local` / senha `123456`.
 
 O frontend não usa mais dados mockados: todas as telas (Usuários,
 Equipamentos, Login) chamam a API de verdade. Ainda não tem roteamento por

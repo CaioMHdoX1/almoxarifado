@@ -1,5 +1,6 @@
 package com.almoxaf.api.dto;
 
+/** Corpo esperado em POST /api/usuarios. */
 public class UsuarioCreateRequestDTO {
 
     private String nome;

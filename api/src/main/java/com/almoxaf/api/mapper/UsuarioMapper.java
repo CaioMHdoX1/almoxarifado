@@ -9,11 +9,6 @@ public final class UsuarioMapper {
     }
 
     public static UsuarioResponseDTO paraResponseDTO(Usuario usuario) {
-        return new UsuarioResponseDTO(
-                usuario.getId(),
-                usuario.getNome(),
-                usuario.getCpf(),
-                usuario.getProjeto(),
-                usuario.getEmail());
+        return new UsuarioResponseDTO(usuario.getId(), usuario.getNome(), usuario.getCpf(), usuario.getProjeto());
     }
 }

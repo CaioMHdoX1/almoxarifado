@@ -1,38 +1,46 @@
 package com.almoxaf.api.service;
 
-import com.almoxaf.api.dto.UsuarioResponseDTO;
+import com.almoxaf.api.dto.AdministradorResponseDTO;
 import com.almoxaf.api.exception.CredenciaisInvalidasException;
-import com.almoxaf.api.mapper.UsuarioMapper;
-import com.almoxaf.api.model.Usuario;
-import com.almoxaf.api.repository.UsuarioRepository;
+import com.almoxaf.api.mapper.AdministradorMapper;
+import com.almoxaf.api.model.Administrador;
+import com.almoxaf.api.repository.AdministradorRepository;
 import com.almoxaf.api.util.PasswordHasher;
 
 import java.util.Optional;
 
 public class AuthService {
 
-    private final UsuarioRepository usuarioRepository;
+    private final AdministradorRepository administradorRepository;
 
     public AuthService() {
-        this(new UsuarioRepository());
+        this(new AdministradorRepository());
     }
 
-    public AuthService(UsuarioRepository usuarioRepository) {
-        this.usuarioRepository = usuarioRepository;
+    /** Construtor usado pelos testes, para injetar um repository mockado. */
+    public AuthService(AdministradorRepository administradorRepository) {
+        this.administradorRepository = administradorRepository;
     }
 
-    public UsuarioResponseDTO autenticar(String email, String senha) {
+    /**
+     * Valida email/senha e devolve os dados públicos do administrador
+     * autenticado. Não abre a sessão HTTP aqui — isso é responsabilidade do
+     * {@code AuthServlet} (camada que conhece {@code HttpServletRequest}).
+     */
+    public AdministradorResponseDTO autenticar(String email, String senha) {
         if (email == null || email.isBlank() || senha == null || senha.isBlank()) {
             throw new CredenciaisInvalidasException("Informe email e senha.");
         }
 
-        Optional<Usuario> usuarioEncontrado = usuarioRepository.buscarPorEmail(email);
+        Optional<Administrador> encontrado = administradorRepository.buscarPorEmail(email);
 
-        Usuario usuario = usuarioEncontrado
-                .filter(u -> u.getSenhaHash() != null)
-                .filter(u -> PasswordHasher.verificar(senha, u.getSenhaHash()))
+        // Mensagem genérica de propósito: não revelar se o problema foi o
+        // email ou a senha (evita enumeration attack — descobrir quais
+        // emails existem cadastrados por tentativa e erro).
+        Administrador administrador = encontrado
+                .filter(a -> PasswordHasher.verificar(senha, a.getSenhaHash()))
                 .orElseThrow(() -> new CredenciaisInvalidasException("Email ou senha inválidos."));
 
-        return UsuarioMapper.paraResponseDTO(usuario);
+        return AdministradorMapper.paraResponseDTO(administrador);
     }
 }

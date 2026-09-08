@@ -23,6 +23,8 @@ export function EquipamentoScanner() {
     setCodigoLido(null);
   }
 
+  // Já leu um código — mostra o resultado em vez da câmera (evita ficar
+  // escaneando em loop o mesmo QR parado na frente da lente).
   if (codigoLido) {
     return (
       <div className="flex max-w-lg flex-col gap-4">

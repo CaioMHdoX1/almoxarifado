@@ -2,6 +2,7 @@ package com.almoxaf.api.model;
 
 import java.time.OffsetDateTime;
 
+/** Espelha a tabela {@code equipamentos} (ver db/init/001_schema.sql). */
 public class Equipamento {
 
     private Long id;
@@ -9,19 +10,12 @@ public class Equipamento {
     private String codigo;
     private String marca;
     private String categoria;
+    private String descricao;
+    private String tipo; // "equipamento" | "almoxarifado"
+    private Integer quantidade; // só preenchido quando tipo = "almoxarifado"
     private OffsetDateTime criadoEm;
 
     public Equipamento() {
-    }
-
-    public Equipamento(Long id, String nome, String codigo, String marca, String categoria,
-                        OffsetDateTime criadoEm) {
-        this.id = id;
-        this.nome = nome;
-        this.codigo = codigo;
-        this.marca = marca;
-        this.categoria = categoria;
-        this.criadoEm = criadoEm;
     }
 
     public Long getId() {
@@ -62,6 +56,30 @@ public class Equipamento {
 
     public void setCategoria(String categoria) {
         this.categoria = categoria;
+    }
+
+    public String getDescricao() {
+        return descricao;
+    }
+
+    public void setDescricao(String descricao) {
+        this.descricao = descricao;
+    }
+
+    public String getTipo() {
+        return tipo;
+    }
+
+    public void setTipo(String tipo) {
+        this.tipo = tipo;
+    }
+
+    public Integer getQuantidade() {
+        return quantidade;
+    }
+
+    public void setQuantidade(Integer quantidade) {
+        this.quantidade = quantidade;
     }
 
     public OffsetDateTime getCriadoEm() {
