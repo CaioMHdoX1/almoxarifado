@@ -6,6 +6,13 @@ import com.zaxxer.hikari.HikariDataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+/**
+ * Ponto único de acesso ao pool de conexões com o Postgres.
+ *
+ * <p>Inicializado uma vez pelo {@link AppContextListener} quando a aplicação
+ * sobe, e usado por todos os {@code repository} para pegar uma
+ * {@link Connection} emprestada do pool.</p>
+ */
 public final class DataSourceProvider {
 
     private static volatile HikariDataSource dataSource;
@@ -15,7 +22,7 @@ public final class DataSourceProvider {
 
     public static synchronized void init() {
         if (dataSource != null) {
-            return; 
+            return; // já inicializado — evita recriar o pool em redeploys acidentais
         }
 
         AppConfig config = AppConfig.getInstance();

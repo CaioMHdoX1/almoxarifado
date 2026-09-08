@@ -5,9 +5,9 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { useCriarEquipamento } from "@/features/equipamentos/api";
 import { EquipamentoForm } from "@/features/equipamentos/components/EquipamentoForm";
+import { EquipamentoQrCode } from "@/features/equipamentos/components/EquipamentoQrCode";
 import type { EquipamentoFormValues } from "@/features/equipamentos/types";
 import type { Equipamento } from "@/lib/types";
-import { EquipamentoQrCode } from "./EquipamentoQrCode";
 
 export function EquipamentoAdicionar() {
   const criarEquipamento = useCriarEquipamento();
@@ -25,6 +25,9 @@ export function EquipamentoAdicionar() {
     }
   }
 
+  // Depois de cadastrar, mostra o QR code em vez do formulário — o
+  // próximo passo natural é imprimir/colar essa etiqueta no equipamento
+  // físico, não ficar olhando pro form vazio de novo.
   if (equipamentoCriado) {
     return (
       <div className="flex max-w-lg flex-col gap-4">

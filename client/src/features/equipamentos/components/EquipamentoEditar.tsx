@@ -35,6 +35,9 @@ export function EquipamentoEditar() {
       nome: equipamentoEmEdicao.nome,
       codigo: equipamentoEmEdicao.codigo,
       marca: equipamentoEmEdicao.marca,
+      descricao: equipamentoEmEdicao.descricao ?? undefined,
+      tipo: equipamentoEmEdicao.tipo,
+      quantidade: equipamentoEmEdicao.quantidade ?? undefined,
     };
     return (
       <Card className="max-w-lg">

@@ -1,16 +1,21 @@
 import {
+  FileText,
   LayoutDashboard,
   LogOut,
+  Moon,
   PackageCheck,
   PackageMinus,
   PackagePlus,
   PackageSearch,
   QrCode,
+  Sun,
   UserPlus,
   UserSearch,
   X,
 } from "lucide-react";
-import type { Usuario } from "@/lib/types";
+import { useEffect, useState } from "react";
+import { aplicarTema, lerTemaSalvo, type Tema } from "@/lib/theme";
+import type { Administrador } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 export type PaginaId =
@@ -21,7 +26,8 @@ export type PaginaId =
   | "equipamentos-consultar"
   | "equipamentos-remover"
   | "equipamentos-editar"
-  | "equipamentos-ler-qr";
+  | "equipamentos-ler-qr"
+  | "relatorios";
 
 type ItemMenu = {
   id: PaginaId;
@@ -56,12 +62,16 @@ const SECOES: SecaoMenu[] = [
       { id: "equipamentos-ler-qr", label: "Ler QR code", icone: QrCode },
     ],
   },
+  {
+    titulo: "Relatórios",
+    itens: [{ id: "relatorios", label: "Relatórios quinzenais", icone: FileText }],
+  },
 ];
 
 type SidebarProps = {
   paginaAtual: PaginaId;
   aoNavegar: (pagina: PaginaId) => void;
-  usuario: Usuario;
+  usuario: Administrador;
   aoSair: () => void;
   aberta: boolean;
   aoFechar: () => void;
@@ -75,8 +85,23 @@ export function Sidebar({
   aberta,
   aoFechar,
 }: SidebarProps) {
+  const [tema, setTema] = useState<Tema>("light");
+
+  // Sincroniza com o que já foi aplicado pelo script inline do index.html
+  // (que roda antes do React montar, pra evitar flash de tema errado).
+  useEffect(() => {
+    setTema(lerTemaSalvo());
+  }, []);
+
+  function alternarTema() {
+    const novoTema: Tema = tema === "dark" ? "light" : "dark";
+    aplicarTema(novoTema);
+    setTema(novoTema);
+  }
+
   return (
     <>
+      {/* Overlay escuro atrás da gaveta — só existe no mobile, some a partir de md */}
       {aberta && (
         <button
           type="button"
@@ -144,13 +169,22 @@ export function Sidebar({
         </nav>
 
         <div className="border-t border-sidebar-border p-3">
+          <button
+            type="button"
+            onClick={alternarTema}
+            className="mb-1 flex w-full items-center gap-2.5 rounded-md px-2 py-2 text-sm text-sidebar-foreground hover:bg-sidebar-accent/60"
+          >
+            {tema === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            {tema === "dark" ? "Modo claro" : "Modo noturno"}
+          </button>
+
           <div className="flex items-center gap-2.5 rounded-md px-2 py-2">
             <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-sidebar-accent text-sm font-medium text-sidebar-accent-foreground">
               {usuario.nome.charAt(0).toUpperCase()}
             </div>
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-medium text-sidebar-foreground">{usuario.nome}</p>
-              <p className="truncate text-xs text-muted-foreground">{usuario.projeto}</p>
+              <p className="truncate text-xs text-muted-foreground">{usuario.email}</p>
             </div>
             <button
               type="button"

@@ -10,6 +10,11 @@ type ConfirmDialogProps = {
   onConfirmar: () => void;
 };
 
+/**
+ * Diálogo modal de confirmação. Usa Base UI (AlertDialog) em vez do
+ * shadcn/Radix do export original do Figma — mesma ideia (Root/Trigger/
+ * Backdrop/Popup), API um pouco diferente (ex.: sem `asChild`, usa `render`).
+ */
 export function ConfirmDialog({
   trigger,
   titulo,

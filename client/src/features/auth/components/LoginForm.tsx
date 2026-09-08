@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { Campo, Input } from "@/components/ui/Input";
+import { Campo, Input, PasswordInput } from "@/components/ui/Input";
 import { useLogin } from "@/features/auth/api";
 import { type LoginFormValues, loginSchema } from "@/features/auth/types";
 
@@ -43,7 +43,7 @@ export function LoginForm() {
           </Campo>
 
           <Campo label="Senha" htmlFor="senha" erro={errors.senha?.message}>
-            <Input id="senha" type="password" placeholder="••••••••" {...register("senha")} />
+            <PasswordInput id="senha" placeholder="••••••••" {...register("senha")} />
           </Campo>
 
           <Button type="submit" disabled={isSubmitting} className="mt-2">

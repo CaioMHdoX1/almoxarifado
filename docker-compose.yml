@@ -17,7 +17,7 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
- 
+
   pgadmin:
     image: dpage/pgadmin4:latest
     container_name: almoxaf-pgadmin
@@ -33,7 +33,7 @@ services:
         condition: service_healthy
     volumes:
       - almoxaf_pgadmin_data:/var/lib/pgadmin
- 
+
   api:
     build:
       context: ./api
@@ -44,13 +44,31 @@ services:
       DB_URL: jdbc:postgresql://db:5432/almoxaf
       DB_USER: almoxaf
       DB_PASSWORD: almoxaf_dev_password
-      CLIENT_ORIGIN: http://localhost:5173
+      # Lista separada por vírgula — libera tanto o Vite em dev (5173)
+      # quanto este client rodando via Docker (3000), ao mesmo tempo.
+      CLIENT_ORIGIN: http://localhost:5173,http://localhost:3000
     ports:
       - "8080:8080"
     depends_on:
       db:
         condition: service_healthy
- 
+
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        # Endereço que o NAVEGADOR usa pra falar com a API — precisa ser
+        # localhost:8080 (a porta publicada no host), não "api:8080" (nome
+        # do serviço só é resolvível *dentro* da rede do Docker, não pelo
+        # navegador rodando na sua máquina).
+        VITE_API_URL: http://localhost:8080
+    container_name: almoxaf-client
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    depends_on:
+      - api
 
 volumes:
   almoxaf_db_data:

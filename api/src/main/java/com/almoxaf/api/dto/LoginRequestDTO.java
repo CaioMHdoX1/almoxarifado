@@ -1,5 +1,6 @@
 package com.almoxaf.api.dto;
 
+/** Corpo esperado em POST /api/auth/login. */
 public class LoginRequestDTO {
 
     private String email;

@@ -12,6 +12,13 @@ import java.sql.Connection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * Endpoint de diagnóstico: confirma que a API subiu e consegue falar com o
+ * banco. Útil para checar o ambiente (Docker Compose, Tomcat, etc.) antes de
+ * testar qualquer regra de negócio.
+ *
+ * <p>GET /api/health → { "data": { "status": "ok", "database": "up" } }</p>
+ */
 @WebServlet("/api/health")
 public class HealthCheckServlet extends HttpServlet {
 

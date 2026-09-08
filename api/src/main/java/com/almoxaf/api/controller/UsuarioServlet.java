@@ -16,7 +16,18 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
-
+/**
+ * Rotas de usuários:
+ *
+ * <ul>
+ *   <li>GET  /api/usuarios?nome=xxx → busca por nome, com os equipamentos
+ *       alocados a cada usuário encontrado</li>
+ *   <li>POST /api/usuarios → cria um novo usuário (nome, cpf, projeto)</li>
+ * </ul>
+ *
+ * <p>Protegido pelo {@code AuthFilter} — precisa estar logado para acessar
+ * (não está na lista de rotas públicas).</p>
+ */
 @WebServlet("/api/usuarios")
 public class UsuarioServlet extends HttpServlet {
 

@@ -1,1 +1,23 @@
-node_modules
+# Env
+.env
+.env.production
+client/.env
+
+# Node / raiz + client
+node_modules/
+client/node_modules/
+client/dist/
+client/.vite/
+client/routeTree.gen.ts
+
+# Java / api
+api/target/
+api/*.war
+*.class
+
+# OS
+.DS_Store
+
+# IDE
+.idea/
+.vscode/

@@ -10,17 +10,20 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Types;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-
+/** Acesso a dados de {@code equipamentos} via JDBC puro. */
 public class EquipamentoRepository {
 
-    public Equipamento criar(String nome, String codigo, String marca) {
+    public Equipamento criar(String nome, String codigo, String marca, String descricao,
+                              String tipo, Integer quantidade) {
         String sql = """
-                INSERT INTO equipamentos (nome, codigo, marca)
-                VALUES (?, ?, ?)
+                INSERT INTO equipamentos (nome, codigo, marca, descricao, tipo, quantidade)
+                VALUES (?, ?, ?, ?, ?, ?)
                 """;
 
         try (Connection conexao = DataSourceProvider.getConnection();
@@ -29,6 +32,9 @@ public class EquipamentoRepository {
             stmt.setString(1, nome);
             stmt.setString(2, codigo);
             stmt.setString(3, marca);
+            stmt.setString(4, descricao);
+            stmt.setString(5, tipo);
+            setIntNullable(stmt, 6, quantidade);
             stmt.executeUpdate();
 
             try (ResultSet chaves = stmt.getGeneratedKeys()) {
@@ -46,10 +52,11 @@ public class EquipamentoRepository {
         }
     }
 
-    public Equipamento editar(long id, String nome, String codigo, String marca) {
+    public Equipamento editar(long id, String nome, String codigo, String marca, String descricao,
+                               String tipo, Integer quantidade) {
         String sql = """
                 UPDATE equipamentos
-                SET nome = ?, codigo = ?, marca = ?
+                SET nome = ?, codigo = ?, marca = ?, descricao = ?, tipo = ?, quantidade = ?
                 WHERE id = ?
                 """;
 
@@ -59,7 +66,10 @@ public class EquipamentoRepository {
             stmt.setString(1, nome);
             stmt.setString(2, codigo);
             stmt.setString(3, marca);
-            stmt.setLong(4, id);
+            stmt.setString(4, descricao);
+            stmt.setString(5, tipo);
+            setIntNullable(stmt, 6, quantidade);
+            stmt.setLong(7, id);
 
             int linhasAfetadas = stmt.executeUpdate();
             if (linhasAfetadas == 0) {
@@ -74,6 +84,7 @@ public class EquipamentoRepository {
         }
     }
 
+    /** @return true se algum registro foi de fato removido. */
     public boolean remover(long id) {
         String sql = "DELETE FROM equipamentos WHERE id = ?";
 
@@ -89,7 +100,7 @@ public class EquipamentoRepository {
 
     public Optional<Equipamento> buscarPorId(long id) {
         String sql = """
-                SELECT id, nome, codigo, marca, categoria, criado_em
+                SELECT id, nome, codigo, marca, categoria, descricao, tipo, quantidade, criado_em
                 FROM equipamentos
                 WHERE id = ?
                 """;
@@ -110,7 +121,7 @@ public class EquipamentoRepository {
 
     public Optional<Equipamento> buscarPorCodigo(String codigo) {
         String sql = """
-                SELECT id, nome, codigo, marca, categoria, criado_em
+                SELECT id, nome, codigo, marca, categoria, descricao, tipo, quantidade, criado_em
                 FROM equipamentos
                 WHERE codigo = ?
                 """;
@@ -129,6 +140,7 @@ public class EquipamentoRepository {
         }
     }
 
+    /** @return true se existe uma alocação ATIVA (data_fim IS NULL) para este equipamento. */
     public boolean possuiAlocacaoAtiva(long equipamentoId) {
         String sql = "SELECT 1 FROM alocacoes WHERE equipamento_id = ? AND data_fim IS NULL";
 
@@ -145,9 +157,11 @@ public class EquipamentoRepository {
         }
     }
 
+    /** Todos os equipamentos, já com status calculado — usado nas telas de Editar/Remover. */
     public List<EquipamentoStatus> listarTodosComStatus() {
         String sql = """
-                SELECT id, nome, codigo, marca, status, usuario_atual_id, usuario_atual_nome
+                SELECT id, nome, codigo, marca, categoria, descricao, tipo, quantidade,
+                       status, usuario_atual_id, usuario_atual_nome
                 FROM vw_equipamentos_status
                 ORDER BY nome, codigo
                 """;
@@ -166,9 +180,11 @@ public class EquipamentoRepository {
         }
     }
 
+    /** Usado pela busca por nome — grupos são montados depois, no EquipamentoService. */
     public List<EquipamentoStatus> buscarStatusPorNomeContendo(String termo) {
         String sql = """
-                SELECT id, nome, codigo, marca, status, usuario_atual_id, usuario_atual_nome
+                SELECT id, nome, codigo, marca, categoria, descricao, tipo, quantidade,
+                       status, usuario_atual_id, usuario_atual_nome
                 FROM vw_equipamentos_status
                 WHERE LOWER(nome) LIKE LOWER(?)
                 ORDER BY nome, codigo
@@ -191,6 +207,32 @@ public class EquipamentoRepository {
         }
     }
 
+    /**
+     * Busca exata por código (patrimônio) — usada tanto pela digitação manual
+     * quanto pela leitura do QR code, que carrega esse mesmo código.
+     */
+    public Optional<EquipamentoStatus> buscarStatusPorCodigo(String codigo) {
+        String sql = """
+                SELECT id, nome, codigo, marca, categoria, descricao, tipo, quantidade,
+                       status, usuario_atual_id, usuario_atual_nome
+                FROM vw_equipamentos_status
+                WHERE codigo = ?
+                """;
+
+        try (Connection conexao = DataSourceProvider.getConnection();
+             PreparedStatement stmt = conexao.prepareStatement(sql)) {
+
+            stmt.setString(1, codigo);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (!rs.next()) return Optional.empty();
+                return Optional.of(mapearLinhaStatus(rs));
+            }
+        } catch (SQLException e) {
+            throw new IllegalStateException("Erro ao buscar equipamento por código.", e);
+        }
+    }
+
     public List<Equipamento> listarPorUsuarioId(long usuarioId) {
         String sql = """
                 SELECT id, nome, codigo, marca, categoria
@@ -207,12 +249,26 @@ public class EquipamentoRepository {
             try (ResultSet rs = stmt.executeQuery()) {
                 List<Equipamento> resultado = new ArrayList<>();
                 while (rs.next()) {
-                    resultado.add(mapearLinha(rs));
+                    Equipamento equipamento = new Equipamento();
+                    equipamento.setId(rs.getLong("id"));
+                    equipamento.setNome(rs.getString("nome"));
+                    equipamento.setCodigo(rs.getString("codigo"));
+                    equipamento.setMarca(rs.getString("marca"));
+                    equipamento.setCategoria(rs.getString("categoria"));
+                    resultado.add(equipamento);
                 }
                 return resultado;
             }
         } catch (SQLException e) {
             throw new IllegalStateException("Erro ao listar equipamentos do usuário.", e);
+        }
+    }
+
+    private void setIntNullable(PreparedStatement stmt, int indice, Integer valor) throws SQLException {
+        if (valor == null) {
+            stmt.setNull(indice, Types.INTEGER);
+        } else {
+            stmt.setInt(indice, valor);
         }
     }
 
@@ -222,7 +278,12 @@ public class EquipamentoRepository {
         equipamento.setNome(rs.getString("nome"));
         equipamento.setCodigo(rs.getString("codigo"));
         equipamento.setMarca(rs.getString("marca"));
-        
+        equipamento.setCategoria(rs.getString("categoria"));
+        equipamento.setDescricao(rs.getString("descricao"));
+        equipamento.setTipo(rs.getString("tipo"));
+        int quantidade = rs.getInt("quantidade");
+        equipamento.setQuantidade(rs.wasNull() ? null : quantidade);
+        equipamento.setCriadoEm(rs.getObject("criado_em", OffsetDateTime.class));
         return equipamento;
     }
 
@@ -232,6 +293,11 @@ public class EquipamentoRepository {
         status.setNome(rs.getString("nome"));
         status.setCodigo(rs.getString("codigo"));
         status.setMarca(rs.getString("marca"));
+        status.setCategoria(rs.getString("categoria"));
+        status.setDescricao(rs.getString("descricao"));
+        status.setTipo(rs.getString("tipo"));
+        int quantidade = rs.getInt("quantidade");
+        status.setQuantidade(rs.wasNull() ? null : quantidade);
         status.setStatus(rs.getString("status"));
         long usuarioAtualId = rs.getLong("usuario_atual_id");
         status.setUsuarioAtualId(rs.wasNull() ? null : usuarioAtualId);

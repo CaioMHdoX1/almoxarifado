@@ -2,6 +2,11 @@ package com.almoxaf.api.dto;
 
 import java.util.List;
 
+/**
+ * Resposta de {@code GET /api/equipamentos?nome=...} — um grupo por nome de
+ * equipamento, com os totais pedidos na especificação (quantos existem,
+ * quantos disponíveis, quantos alocados) e a lista individual de itens.
+ */
 public class EquipamentoBuscaResultadoDTO {
 
     private String nome;

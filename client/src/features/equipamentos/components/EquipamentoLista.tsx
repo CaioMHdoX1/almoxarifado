@@ -22,7 +22,7 @@ export function EquipamentoLista({ equipamentos, renderAcoes }: EquipamentoLista
               <th className="px-4 py-3 font-medium">Nome</th>
               <th className="px-4 py-3 font-medium">Código</th>
               <th className="px-4 py-3 font-medium">Marca</th>
-              <th className="px-4 py-3 font-medium">Status</th>
+              <th className="px-4 py-3 font-medium">Status / Qtd</th>
               <th className="px-4 py-3 font-medium">Com quem está</th>
               <th className="px-4 py-3 font-medium">Ações</th>
             </tr>
@@ -36,10 +36,18 @@ export function EquipamentoLista({ equipamentos, renderAcoes }: EquipamentoLista
                 </td>
                 <td className="whitespace-nowrap px-4 py-3 text-foreground">{equipamento.marca}</td>
                 <td className="whitespace-nowrap px-4 py-3">
-                  <StatusBadge status={equipamento.status} />
+                  {equipamento.tipo === "almoxarifado" ? (
+                    <span className="rounded-full bg-secondary px-2.5 py-0.5 text-xs font-medium text-secondary-foreground">
+                      Qtd: {equipamento.quantidade}
+                    </span>
+                  ) : (
+                    <StatusBadge status={equipamento.status} />
+                  )}
                 </td>
                 <td className="whitespace-nowrap px-4 py-3 text-foreground">
-                  {equipamento.usuarioAtual?.nome ?? "—"}
+                  {equipamento.tipo === "almoxarifado"
+                    ? "—"
+                    : (equipamento.usuarioAtual?.nome ?? "—")}
                 </td>
                 <td className="whitespace-nowrap px-4 py-3">{renderAcoes(equipamento)}</td>
               </tr>

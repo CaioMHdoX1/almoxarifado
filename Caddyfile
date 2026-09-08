@@ -1,0 +1,32 @@
+# Configuração do Caddy — proxy reverso único de entrada em produção.
+#
+# Por que isso é importante:
+# - HTTPS automático (Let's Encrypt), renovado sozinho, sem configurar nada.
+# - Com tudo atrás de UM domínio só, o navegador enxerga frontend e API
+#   como a MESMA origem — elimina de vez a complexidade de CORS (o
+#   CorsFilter da API vira só uma segunda camada de defesa, não mais
+#   estritamente necessário pro funcionamento).
+# - Câmera do QR code passa a funcionar de verdade no celular (a leitura
+#   exige HTTPS "de verdade" — ver README, isso resolve aquela limitação).
+# - db, api e client ficam só na rede interna do Docker — não expostos
+#   diretamente à internet, só o Caddy (porta 80/443) é público.
+#
+# Troque "seu-dominio.com.br" pelo domínio de verdade antes de subir.
+
+{$DOMINIO} {
+	# Tudo que começar com /api/ vai pro backend Java
+	handle /api/* {
+		reverse_proxy api:8080
+	}
+
+	# O resto (a SPA React) vai pro Nginx do client
+	handle {
+		reverse_proxy client:80
+	}
+
+	encode gzip
+	log {
+		output stdout
+		format json
+	}
+}

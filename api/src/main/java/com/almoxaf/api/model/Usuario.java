@@ -2,27 +2,27 @@ package com.almoxaf.api.model;
 
 import java.time.OffsetDateTime;
 
+/**
+ * Espelha a tabela {@code usuarios} — PESSOAS que podem estar de posse de
+ * um equipamento. Não fazem login (isso é exclusividade de
+ * {@link Administrador}), por isso não têm email nem senha.
+ */
 public class Usuario {
 
     private Long id;
     private String nome;
-    private String cpf;
+    private String cpf; // só dígitos
     private String projeto;
-    private String email;
-    private String senhaHash;
     private OffsetDateTime criadoEm;
 
     public Usuario() {
     }
 
-    public Usuario(Long id, String nome, String cpf, String projeto, String email, String senhaHash,
-                   OffsetDateTime criadoEm) {
+    public Usuario(Long id, String nome, String cpf, String projeto, OffsetDateTime criadoEm) {
         this.id = id;
         this.nome = nome;
         this.cpf = cpf;
         this.projeto = projeto;
-        this.email = email;
-        this.senhaHash = senhaHash;
         this.criadoEm = criadoEm;
     }
 
@@ -56,22 +56,6 @@ public class Usuario {
 
     public void setProjeto(String projeto) {
         this.projeto = projeto;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getSenhaHash() {
-        return senhaHash;
-    }
-
-    public void setSenhaHash(String senhaHash) {
-        this.senhaHash = senhaHash;
     }
 
     public OffsetDateTime getCriadoEm() {

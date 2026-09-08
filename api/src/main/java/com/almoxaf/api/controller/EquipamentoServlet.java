@@ -18,6 +18,24 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Rotas de equipamentos:
+ *
+ * <ul>
+ *   <li>GET    /api/equipamentos?nome=xxx → busca agrupada por nome, com
+ *       total/disponíveis/alocados (se {@code nome} não for informado,
+ *       lista tudo — usado pelas telas de Editar/Remover)</li>
+ *   <li>GET    /api/equipamentos/codigo/{codigo} → busca exata por código
+ *       (patrimônio) — usada pela leitura do QR code</li>
+ *   <li>POST   /api/equipamentos      → cria (nome, código, marca)</li>
+ *   <li>PUT    /api/equipamentos/{id} → edita</li>
+ *   <li>DELETE /api/equipamentos/{id} → remove</li>
+ * </ul>
+ *
+ * <p>O mapeamento {@code "/api/equipamentos/*"} cobre tanto a URL exata
+ * quanto com sufixo de id — {@code req.getPathInfo()} devolve {@code null}
+ * no primeiro caso e {@code "/{id}"} no segundo.</p>
+ */
 @WebServlet("/api/equipamentos/*")
 public class EquipamentoServlet extends HttpServlet {
 
@@ -27,6 +45,15 @@ public class EquipamentoServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         try {
+            String pathInfo = req.getPathInfo(); // null, ou "/codigo/PAT-00812"
+
+            if (pathInfo != null && pathInfo.startsWith("/codigo/")) {
+                String codigo = pathInfo.substring("/codigo/".length());
+                EquipamentoResponseDTO resultado = equipamentoService.buscarPorCodigo(codigo);
+                JsonResponseWriter.writeData(resp, resultado);
+                return;
+            }
+
             String nome = req.getParameter("nome");
 
             if (nome != null && !nome.isBlank()) {
@@ -77,12 +104,13 @@ public class EquipamentoServlet extends HttpServlet {
         }
     }
 
+    /** Extrai o {id} de "/{id}" (o pathInfo). Lança erro de negócio se não vier um número válido. */
     private long extrairId(HttpServletRequest req) {
-        String pathInfo = req.getPathInfo(); 
+        String pathInfo = req.getPathInfo(); // ex.: "/42"
         if (pathInfo == null || pathInfo.equals("/")) {
             throw new RegraDeNegocioException("Informe o id do equipamento na URL (ex.: /api/equipamentos/42).");
         }
-        String idBruto = pathInfo.substring(1);
+        String idBruto = pathInfo.substring(1); // remove a barra inicial
         try {
             return Long.parseLong(idBruto);
         } catch (NumberFormatException e) {

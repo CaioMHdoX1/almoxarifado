@@ -5,7 +5,8 @@ import { defineConfig } from "vitest/config";
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
+  // biome-ignore lint/suspicious/noExplicitAny: bypass no conflito de tipos do vite/vitest
+  plugins: [react(), tailwindcss()] as any,
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),

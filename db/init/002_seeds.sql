@@ -3,39 +3,58 @@
 -- ============================================================================
 
 -- ----------------------------------------------------------------------------
--- Usuários
+-- Administrador (único usuário que consegue logar)
 -- ----------------------------------------------------------------------------
--- senha_hash abaixo corresponde à senha "123456" para todos (só para
--- desenvolvimento/teste!). Gerado com PBKDF2WithHmacSHA256, 210.000
--- iterações — mesmo algoritmo do util/PasswordHasher.java da API.
--- Formato: {iterações}:{salt base64}:{hash base64}
+-- senha: "123456" (só para desenvolvimento/teste!). Gerado com
+-- PBKDF2WithHmacSHA256, 210.000 iterações — mesmo algoritmo do
+-- util/PasswordHasher.java da API. Formato: {iterações}:{salt}:{hash}
 -- ----------------------------------------------------------------------------
-INSERT INTO usuarios (nome, cpf, projeto, email, senha_hash) VALUES
-    ('Ana Beatriz Costa',   '11122233344', 'GREat',        'ana.costa@empresa.com',
-        '210000:IIG7FDMbq3bZY7k26awr7g==:tbWMz7/KlqOIxf+5fG3XrETWZv2jSIVc1xER73KnzuM='),
-    ('Carlos Mendes',       '22233344455', 'GREat',        'carlos.mendes@empresa.com',
-        '210000:IIG7FDMbq3bZY7k26awr7g==:tbWMz7/KlqOIxf+5fG3XrETWZv2jSIVc1xER73KnzuM='),
-    ('Marina Ferreira',     '33344455566', 'Projeto Atlas', 'marina.ferreira@empresa.com',
-        '210000:IIG7FDMbq3bZY7k26awr7g==:tbWMz7/KlqOIxf+5fG3XrETWZv2jSIVc1xER73KnzuM='),
-    ('João Silva',          '44455566677', 'Projeto Atlas', 'joao.silva@empresa.com',
-        '210000:IIG7FDMbq3bZY7k26awr7g==:tbWMz7/KlqOIxf+5fG3XrETWZv2jSIVc1xER73KnzuM='),
-    ('Beatriz Nunes',       '55566677788', 'GREat',        'beatriz.nunes@empresa.com',
+INSERT INTO administradores (nome, email, senha_hash) VALUES
+    ('Administrador', 'admin@almoxaf.local',
         '210000:IIG7FDMbq3bZY7k26awr7g==:tbWMz7/KlqOIxf+5fG3XrETWZv2jSIVc1xER73KnzuM=');
 
 -- ----------------------------------------------------------------------------
--- Equipamentos
+-- Usuários (pessoas que podem estar de posse de um equipamento — não logam)
 -- ----------------------------------------------------------------------------
-INSERT INTO equipamentos (nome, codigo, marca, categoria) VALUES
-    ('Notebook Dell Latitude 5520', 'PAT-00812', 'Dell',   'Notebook'),
-    ('Notebook Dell Latitude 5520', 'PAT-00813', 'Dell',   'Notebook'),
-    ('Notebook Dell Latitude 5520', 'PAT-00814', 'Dell',   'Notebook'),
-    ('Switch Cisco SG350-10',       'PAT-00734', 'Cisco',  'Rede'),
-    ('Monitor LG 27" IPS',          'PAT-00691', 'LG',     'Monitor'),
-    ('Monitor LG 27" IPS',          'PAT-00692', 'LG',     'Monitor'),
-    ('Teclado Logitech K120',       'PAT-00501', 'Logitech','Periférico');
+INSERT INTO usuarios (nome, cpf, projeto) VALUES
+    ('Ana Beatriz Costa',   '11122233344', 'GREat'),
+    ('Carlos Mendes',       '22233344455', 'GREat'),
+    ('Marina Ferreira',     '33344455566', 'Projeto Atlas'),
+    ('João Silva',          '44455566677', 'Projeto Atlas'),
+    ('Beatriz Nunes',       '55566677788', 'GREat');
 
 -- ----------------------------------------------------------------------------
--- Alocações
+-- Equipamentos (tipo 'equipamento' — itens únicos, controlados por código)
+-- ----------------------------------------------------------------------------
+INSERT INTO equipamentos (nome, codigo, marca, categoria, descricao, tipo) VALUES
+    ('Notebook Dell Latitude 5520', 'PAT-00812', 'Dell', 'Notebook',
+        'i7 11ª geração, 16GB RAM, SSD 512GB', 'equipamento'),
+    ('Notebook Dell Latitude 5520', 'PAT-00813', 'Dell', 'Notebook',
+        'i7 11ª geração, 16GB RAM, SSD 512GB', 'equipamento'),
+    ('Notebook Dell Latitude 5520', 'PAT-00814', 'Dell', 'Notebook',
+        'i7 11ª geração, 16GB RAM, SSD 512GB', 'equipamento'),
+    ('Switch Cisco SG350-10',       'PAT-00734', 'Cisco', 'Rede',
+        '10 portas gigabit gerenciável', 'equipamento'),
+    ('Monitor LG 27" IPS',          'PAT-00691', 'LG', 'Monitor',
+        'Full HD, entrada HDMI e DisplayPort', 'equipamento'),
+    ('Monitor LG 27" IPS',          'PAT-00692', 'LG', 'Monitor',
+        'Full HD, entrada HDMI e DisplayPort', 'equipamento'),
+    ('Teclado Logitech K120',       'PAT-00501', 'Logitech', 'Periférico',
+        'ABNT2, com fio USB', 'equipamento');
+
+-- ----------------------------------------------------------------------------
+-- Itens de almoxarifado (tipo 'almoxarifado' — controlados por quantidade)
+-- ----------------------------------------------------------------------------
+INSERT INTO equipamentos (nome, codigo, marca, categoria, descricao, tipo, quantidade) VALUES
+    ('Cabo de rede Cat6 (2m)',   'ALM-00001', 'Furukawa', 'Cabo',
+        'Cabo de rede Cat6 azul, conectorizado', 'almoxarifado', 42),
+    ('Parafuso M3 para rack',    'ALM-00002', 'Genérico', 'Fixação',
+        'Pacote com 100 unidades cada', 'almoxarifado', 8),
+    ('Mouse óptico USB',         'ALM-00003', 'Logitech', 'Periférico',
+        'Mouse básico com fio', 'almoxarifado', 15);
+
+-- ----------------------------------------------------------------------------
+-- Alocações (só para itens tipo 'equipamento')
 -- (algumas ativas — data_fim NULL — e uma já finalizada, para ter histórico)
 -- ----------------------------------------------------------------------------
 

@@ -10,6 +10,7 @@ import { EquipamentoBusca } from "@/features/equipamentos/components/Equipamento
 import { EquipamentoEditar } from "@/features/equipamentos/components/EquipamentoEditar";
 import { EquipamentoRemover } from "@/features/equipamentos/components/EquipamentoRemover";
 import { EquipamentoScanner } from "@/features/equipamentos/components/EquipamentoScanner";
+import { Relatorios } from "@/features/relatorios/components/Relatorios";
 import { UsuarioBusca } from "@/features/usuarios/components/UsuarioBusca";
 import { UsuarioForm } from "@/features/usuarios/components/UsuarioForm";
 
@@ -34,6 +35,10 @@ const TITULOS: Record<PaginaId, { titulo: string; descricao?: string }> = {
     titulo: "Ler QR code",
     descricao: "Aponte a câmera para consultar um equipamento",
   },
+  relatorios: {
+    titulo: "Relatórios quinzenais",
+    descricao: "Entregas, devoluções e quem está com o quê",
+  },
 };
 
 export default function App() {
@@ -41,6 +46,8 @@ export default function App() {
   const logout = useLogout();
   const [pagina, setPagina] = useState<PaginaId>("inicio");
 
+  // Ainda checando se existe uma sessão válida (cookie) — evita mostrar o
+  // login por um instante mesmo quando o usuário já está autenticado.
   if (isLoading) {
     return (
       <div className="flex h-screen items-center justify-center bg-background">
@@ -77,6 +84,7 @@ export default function App() {
       {pagina === "equipamentos-editar" && <EquipamentoEditar />}
       {pagina === "equipamentos-remover" && <EquipamentoRemover />}
       {pagina === "equipamentos-ler-qr" && <EquipamentoScanner />}
+      {pagina === "relatorios" && <Relatorios />}
     </PageShell>
   );
 }

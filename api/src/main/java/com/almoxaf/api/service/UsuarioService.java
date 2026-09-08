@@ -26,6 +26,7 @@ public class UsuarioService {
         this(new UsuarioRepository(), new EquipamentoRepository());
     }
 
+    /** Construtor usado pelos testes, para injetar repositories mockados. */
     public UsuarioService(UsuarioRepository usuarioRepository, EquipamentoRepository equipamentoRepository) {
         this.usuarioRepository = usuarioRepository;
         this.equipamentoRepository = equipamentoRepository;
@@ -39,14 +40,22 @@ public class UsuarioService {
         if (nome.length() < 3) {
             throw new RegraDeNegocioException("Informe o nome completo do usuário.");
         }
+        if (nome.length() > 150) {
+            throw new RegraDeNegocioException("Nome não pode ter mais de 150 caracteres.");
+        }
         if (!CPF_SOMENTE_DIGITOS.matcher(cpf).matches()) {
             throw new RegraDeNegocioException("CPF deve conter exatamente 11 dígitos.");
         }
         if (projeto.isEmpty()) {
             throw new RegraDeNegocioException("Informe o projeto associado ao usuário.");
         }
+        if (projeto.length() > 150) {
+            throw new RegraDeNegocioException("Nome do projeto não pode ter mais de 150 caracteres.");
+        }
 
-
+        // Checagem "otimista" — dá uma mensagem melhor na maioria dos casos.
+        // A proteção definitiva contra corrida entre requisições simultâneas
+        // é a constraint UNIQUE do banco, reforçada no UsuarioRepository.criar.
         if (usuarioRepository.buscarPorCpf(cpf).isPresent()) {
             throw new RegistroDuplicadoException("Já existe um usuário cadastrado com esse CPF.");
         }
@@ -55,9 +64,17 @@ public class UsuarioService {
         return UsuarioMapper.paraResponseDTO(usuarioCriado);
     }
 
+    /**
+     * Busca usuários por nome (parcial, sem diferenciar maiúsculas) e já
+     * traz, para cada um, os equipamentos atualmente alocados a ele — é
+     * exatamente o comportamento pedido na especificação do projeto.
+     */
     public List<UsuarioComEquipamentosDTO> buscarPorNome(String termo) {
         if (termo == null || termo.isBlank()) {
             throw new RegraDeNegocioException("Informe um termo de busca.");
+        }
+        if (termo.length() > 150) {
+            throw new RegraDeNegocioException("Termo de busca muito longo.");
         }
 
         List<Usuario> usuariosEncontrados = usuarioRepository.buscarPorNomeContendo(termo.trim());

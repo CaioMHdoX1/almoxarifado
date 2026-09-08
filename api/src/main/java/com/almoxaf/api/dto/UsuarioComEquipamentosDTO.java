@@ -2,6 +2,11 @@ package com.almoxaf.api.dto;
 
 import java.util.List;
 
+/**
+ * Resposta de {@code GET /api/usuarios?nome=...} — exatamente o que a
+ * especificação pediu: ao buscar um usuário por nome, vêm junto todos os
+ * equipamentos atualmente alocados a ele.
+ */
 public class UsuarioComEquipamentosDTO {
 
     private UsuarioResponseDTO usuario;
